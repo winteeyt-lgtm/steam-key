@@ -25,6 +25,9 @@
             box-shadow: var(--freedom-glow); transition: box-shadow 0.5s ease, background 0.3s ease, color 0.3s ease;
         }
 
+        /* Задний анимированный фон */
+        #bgEffectsCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 1; pointer-events: auto; }
+
         /* Неоновое солнце */
         .secret-sun {
             display: none; position: absolute; top: 25px; right: 25px; width: 40px; height: 40px;
@@ -42,7 +45,7 @@
         /* Навигация */
         .nav-container {
             background: var(--card-bg); border-radius: 50px; border: 1px solid var(--border-color);
-            display: inline-flex; position: relative; margin-bottom: 30px; overflow: hidden;
+            display: inline-flex; position: relative; margin-bottom: 30px; overflow: hidden; z-index: 9000;
         }
         .nav-btn { background: none; border: none; color: var(--text-color); padding: 12px 24px; font-size: 14px; font-weight: 600; cursor: pointer; z-index: 2; }
         .nav-pill { position: absolute; top: 0; left: 0; height: 100%; background: var(--pill-bg); border-radius: 50px; z-index: 1; transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1); }
@@ -50,7 +53,7 @@
         /* Карточка */
         .main-card {
             background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px;
-            padding: 30px; width: 100%; max-width: 400px; min-height: 220px;
+            padding: 30px; width: 100%; max-width: 400px; min-height: 220px; z-index: 9000;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center;
         }
 
@@ -72,7 +75,7 @@
 
         /* Темы */
         .theme-list { display: flex; flex-direction: column; gap: 10px; }
-        .theme-item { display: flex; align-items: center; justify-content: space-between; background: var(--bg-color); padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; }
+        .theme-item { display: flex; align-items: center; justify-content: space-between; background: var(--card-bg); padding: 12px 15px; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer; }
         .theme-info { display: flex; align-items: center; gap: 12px; }
         .theme-preview { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); }
 
@@ -89,7 +92,9 @@
         .math-test-container { margin-top: 10px; display: none; flex-direction: column; gap: 8px; width: 100%; }
         .math-input { width: 100%; padding: 8px; border-radius: 6px; border: 2px solid var(--border-color); background: var(--card-bg); color: var(--text-color); text-align: center; font-size: 16px; }
 
-        /* ОБЩИЙ ТАЙМЕР */
+        .btn-reset-small { background: none; border: 1px dashed #ff3333; color: #ff3333; font-size: 10px; padding: 5px; border-radius: 4px; cursor: pointer; margin-top: auto; opacity: 0.7; }
+        .btn-reset-small:hover { opacity: 1; background: rgba(255,51,51,0.05); }
+
         .admin-timer {
             display: none; position: fixed; bottom: 20px; right: 20px; background: #000000;
             border: 2px solid #ff3333; color: #ff3333; padding: 10px 18px; border-radius: 8px;
@@ -97,20 +102,26 @@
         }
 
         /* ХОЛСТ ДЛЯ РИСОВАНИЯ */
-        #paintCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 8888; pointer-events: none; }
+        #paintCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 9500; pointer-events: none; }
         #paintCanvas.drawing-active { pointer-events: auto; }
 
         /* ПАНЕЛЬ ХУДОЖНИКА */
         .paint-panel {
-            display: none; position: fixed; bottom: 80px; right: 20px; background: var(--card-bg);
-            border: 2px solid var(--border-color); border-radius: 12px; padding: 15px; width: 230px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 9999; cursor: pointer; gap: 10px; flex-direction: column;
+            display: none; position: fixed; top: 20px; right: 80px; background: var(--card-bg);
+            border: 2px solid var(--border-color); border-radius: 12px; padding: 12px; width: 220px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); z-index: 99999; cursor: move; flex-direction: column; gap: 8px;
         }
-        .paint-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 12px; font-weight: bold; }
-        .paint-tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-top: 5px; }
-        .tool-btn { background: var(--bg-color); border: 1px solid var(--border-color); padding: 8px; border-radius: 6px; font-size: 14px; cursor: pointer; color: var(--text-color); text-align: center; }
+        .paint-panel.collapsed { width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center; border-radius: 50%; border-color: #ff33a6; }
+        .paint-panel.collapsed .paint-content { display: none; }
+        .paint-panel.collapsed .btn-collapse { position: static; width: 100%; height: 100%; background: none; border: none; font-size: 20px; }
+        
+        .paint-content { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+        .paint-row { display: flex; gap: 8px; align-items: center; justify-content: space-between; font-size: 11px; font-weight: bold; }
+        .paint-tools-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .tool-btn { background: var(--bg-color); border: 1px solid var(--border-color); padding: 6px; border-radius: 4px; font-size: 12px; cursor: pointer; color: var(--text-color); text-align: center; }
         .tool-btn.active { background: #ffcc00; color: #000; border-color: #ffaa00; }
-        .brush-select { width: 100%; padding: 6px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
+        .brush-select { width: 100%; padding: 4px; background: var(--bg-color); border: 1px solid var(--border-color); color: var(--text-color); border-radius: 4px; font-size: 11px; font-weight: bold; }
+        .btn-collapse { background: rgba(0,0,0,0.05); border: none; padding: 2px 6px; border-radius: 4px; font-size: 10px; cursor: pointer; color: var(--text-color); }
 
         .drag-active { position: fixed !important; z-index: 100000 !important; pointer-events: none; box-shadow: 0 15px 30px rgba(0,0,0,0.4) !important; transform: scale(1.04); }
         .admin-toggle-btn { display: none; position: fixed; left: 0; top: 50%; transform: translateY(-50%); background: var(--card-bg); border: 1px solid var(--border-color); border-left: none; color: var(--text-color); padding: 15px 8px; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 100000; font-size: 14px; }
@@ -119,36 +130,41 @@
 </head>
 <body>
 
+    <canvas id="bgEffectsCanvas"></canvas>
+
     <div class="admin-timer drag-target edit-target" id="adminTimer">10:00</div>
 
     <canvas id="paintCanvas"></canvas>
 
-    <div class="paint-panel drag-target" id="paintPanel">
-        <div class="paint-row">
-            <span>Цвет:</span>
-            <input type="color" id="brushColor" value="#ff3333" style="cursor:pointer; border:none; width:40px; height:24px; border-radius:4px;">
-        </div>
-        <div class="paint-row">
-            <span>Размер: <span id="sizeVal">10</span></span>
-            <input type="range" id="brushSize" min="2" max="50" value="10" style="width:120px;">
-        </div>
-        <div class="paint-row">
-            <span>Прозрачность: <span id="opacVal">100</span>%</span>
-            <input type="range" id="brushOpacity" min="10" max="100" value="100" style="width:100px;">
-        </div>
-        <div class="paint-row" style="margin-top:4px;">
-            <select class="brush-select" id="brushTypeSelect">
-                <option value="classic">🖌 Кисть (Обычная)</option>
-                <option value="sponge">🧽 Губка (Тычки)</option>
-                <option value="spray">💨 Баллончик (Физика)</option>
-                <option value="eraser">🧽 Стёрка краски</option>
-                <option value="destroyer">💥 Мульти-стёрка сайта</option>
-            </select>
-        </div>
-        <div class="paint-tools-grid">
-            <button class="tool-btn active" id="tool-brush" onclick="setMainTool('brush')">✏️</button>
-            <button class="tool-btn" id="tool-bucket" onclick="setMainTool('bucket')">🪣</button>
-            <button class="tool-btn" id="tool-picker" onclick="setMainTool('picker')">🧪</button>
+    <div class="paint-panel" id="paintPanel">
+        <button class="btn-collapse" id="collapsePanelBtn" onclick="toggleCollapsePanel()">–</button>
+        <div class="paint-content">
+            <div class="paint-row">
+                <span>Цвет:</span>
+                <input type="color" id="brushColor" value="#ff3333" style="cursor:pointer; border:none; width:35px; height:20px;">
+            </div>
+            <div class="paint-row">
+                <span>Размер: <span id="sizeVal">10</span></span>
+                <input type="range" id="brushSize" min="2" max="50" value="10" style="width:110px;">
+            </div>
+            <div class="paint-row">
+                <span>Прозрачность: <span id="opacVal">100</span>%</span>
+                <input type="range" id="brushOpacity" min="10" max="100" value="100" style="width:90px;">
+            </div>
+            <div class="paint-row">
+                <select class="brush-select" id="brushTypeSelect">
+                    <option value="classic">🖌 Кисть (Обычная)</option>
+                    <option value="sponge">🧽 Губка (Тычки)</option>
+                    <option value="spray">💨 Баллончик (Физика)</option>
+                    <option value="eraser">🧽 Стёрка краски</option>
+                    <option value="destroyer">💥 Мульти-стёрка сайта</option>
+                </select>
+            </div>
+            <div class="paint-tools-grid">
+                <button class="tool-btn active" id="tool-brush" onclick="setMainTool('brush')">✏️</button>
+                <button class="tool-btn" id="tool-bucket" onclick="setMainTool('bucket')">🪣</button>
+                <button class="tool-btn" id="tool-picker" onclick="setMainTool('picker')">🧪</button>
+            </div>
         </div>
     </div>
 
@@ -163,12 +179,8 @@
 
     <div class="admin-sidebar" id="adminSidebar">
         <div class="admin-sidebar-title">Панель Админа</div>
-        <div class="admin-func-box" id="modeFreedomBtn" onclick="tryActivateMode('freedom')">
-            <span>∞</span> — Свободный режим
-        </div>
-        <div class="admin-func-box" id="modePaintBtn" onclick="tryActivateMode('paint')">
-            <span>✏️</span> — Режим рисования
-        </div>
+        <div class="admin-func-box" id="modeFreedomBtn" onclick="tryActivateMode('freedom')"><span>∞</span> — Свободный режим</div>
+        <div class="admin-func-box" id="modePaintBtn" onclick="tryActivateMode('paint')"><span>✏️</span> — Режим рисования</div>
         
         <div class="math-test-container" id="mathTestBlock">
             <p id="mathQuestion" style="font-size: 13px; text-align: center;"></p>
@@ -176,7 +188,7 @@
             <button class="btn-generate" onclick="verifyMathAnswer()" style="padding: 8px; font-size: 13px;">ОК</button>
         </div>
 
-        <button class="btn-generate" onclick="resetAllDestructions()" style="margin-top:auto; background:#ff3333; color:#fff; font-size:12px; padding:10px;">➔ Вернуть всё назад</button>
+        <button class="btn-reset-small" onclick="resetAllDestructions()">Вернуть обратно (для рисования)</button>
     </div>
     <button class="admin-toggle-btn" id="adminToggle" onclick="toggleAdminPanel()">➔</button>
 
@@ -184,7 +196,6 @@
         <div id="page-info" class="page">
             <p class="info-text edit-target" id="infoTxtElement">На этом сайте генерируются случайные символы для ключа от игры Steam. С шансом 99.99999% сгенерируется неверный код, но всегда останется тот самый 0.00001% на рабочую игру! Удачи!</p>
         </div>
-
         <div id="page-menu" class="page">
             <input type="text" class="code-box drag-target" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
             <div class="action-row">
@@ -192,17 +203,15 @@
                 <button class="btn-copy drag-target edit-target" id="copyBtnObj" onclick="copyKey()">Копия</button>
             </div>
         </div>
-
         <div id="page-themes" class="page">
             <div class="theme-list">
-                <div class="theme-item drag-target" onclick="setTheme('white')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div><span class="edit-target">Светлая (Базовая)</span></div></div>
-                <div class="theme-item drag-target" onclick="setTheme('black')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div><span class="edit-target">Тёмная классика 🌟</span></div></div>
-                <div class="theme-item drag-target" onclick="setTheme('red')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div><span class="edit-target">Красный неон</span></div></div>
-                <div class="theme-item drag-target" onclick="setTheme('green')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div><span class="edit-target">Хакерский зелёный</span></div></div>
-                <div class="theme-item drag-target" onclick="setTheme('blue')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div><span class="edit-target">Космический синий</span></div></div>
+                <div class="theme-item" onclick="setTheme('white')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div><span class="edit-target">Светлая (Базовая)</span></div></div>
+                <div class="theme-item" onclick="setTheme('black')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div><span class="edit-target">Тёмная классика 🌟</span></div></div>
+                <div class="theme-item" onclick="setTheme('red')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div><span class="edit-target">Красный неон</span></div></div>
+                <div class="theme-item" onclick="setTheme('green')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div><span class="edit-target">Хакерский зелёный</span></div></div>
+                <div class="theme-item" onclick="setTheme('blue')"><div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div><span class="edit-target">Космический синий</span></div></div>
             </div>
         </div>
-
         <div id="page-captcha" class="page">
             <div class="admin-prompt-title">Активировать режим админа?</div>
             <div class="captcha-phrase" id="captchaTarget">...</div>
@@ -212,47 +221,60 @@
     </div>
 
     <script>
-        let currentMode = null;
+        let currentMode = null; let currentPage = 'menu'; let activeTheme = 'white';
         let mathNum1, mathNum2, mathCorrectAnswer, pendingMode;
         let countdownInterval = null;
-
-        // Единая база времени админки
         let globalAdminTime = { timeLeft: 600, isBlocked: false, isInfinite: false };
+        let pageCanvasMemory = { info: null, menu: null, themes: null };
 
-        // Состояние холста рисования
-        const canvas = document.getElementById('paintCanvas');
-        const ctx = canvas.getContext('2d');
-        let isDrawing = false;
-        let lastX = 0, lastY = 0;
-        let currentMainTool = 'brush'; // brush, bucket, picker
-        let sprayInterval = null;
-        let sprayHoldTime = 0;
-        let sprayX = 0, sprayY = 0;
-        let activeDrips = []; // Хранение капель физики баллончика
+        const canvas = document.getElementById('paintCanvas'); const ctx = canvas.getContext('2d');
+        const bgCanvas = document.getElementById('bgEffectsCanvas'); const bgCtx = bgCanvas.getContext('2d');
+        
+        let isDrawing = false; let lastX = 0, lastY = 0; let currentMainTool = 'brush';
+        let sprayInterval = null; let sprayHoldTime = 0; let sprayX = 0, sprayY = 0; let activeDrips = [];
+
+        // Переменные для систем анимации фонов
+        let matrixColumns = [];
+        let oceanFish = []; let oceanWaves = 0; let oceanDarkness = 0;
+        let spaceParticles = []; let mouseX = window.innerWidth/2, mouseY = window.innerHeight/2;
 
         function switchPage(pageId, btnElement) {
+            if (currentMode === 'paint' || pageCanvasMemory[currentPage]) {
+                pageCanvasMemory[currentPage] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            }
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(`page-${pageId}`).classList.add('active');
+            currentPage = pageId;
+
             if (btnElement) {
                 const pill = document.getElementById('pill');
-                pill.style.width = btnElement.offsetWidth + 'px';
-                pill.style.left = btnElement.offsetLeft + 'px';
+                pill.style.width = btnElement.offsetWidth + 'px'; pill.style.left = btnElement.offsetLeft + 'px';
             }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            if (pageCanvasMemory[pageId]) ctx.putImageData(pageCanvasMemory[pageId], 0, 0);
         }
 
         window.onload = function() {
             switchPage('menu', document.getElementById('nav-menu'));
-            resizeCanvas();
-            setupFreedomEngine();
-            setupDrawingEngine();
+            resizeCanvas(); setupFreedomEngine(); setupDrawingEngine(); setupPanelDrag();
             window.addEventListener('resize', resizeCanvas);
             
-            // Динамический вывод значений ползунков рисовача
+            // Слежение за мышкой для красного космического фона
+            window.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+            window.addEventListener('touchmove', (e) => { if(e.touches.length > 0) { mouseX = e.touches[0].clientX; mouseY = e.touches[0].clientY; } });
+
             document.getElementById('brushSize').oninput = function() { document.getElementById('sizeVal').innerText = this.value; };
             document.getElementById('brushOpacity').oninput = function() { document.getElementById('opacVal').innerText = this.value; };
+            
+            initBackgrounds();
+            requestAnimationFrame(renderLoop);
         };
 
-        function resizeCanvas() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        function resizeCanvas() {
+            canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            initBackgrounds();
+        }
 
         function generateSteamKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -261,325 +283,6 @@
         }
 
         function copyKey() {
-            const copyText = document.getElementById('keyDisplay');
-            if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
+            const copyText = document.getElementById('keyDisplay'); if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
             copyText.select(); navigator.clipboard.writeText(copyText.value);
-            document.getElementById('copyBtnObj').innerText = '✓';
-            setTimeout(() => document.getElementById('copyBtnObj').innerText = 'Копия', 1000);
-        }
-
-        // --- ТЕМЫ ---
-        const themes = {
-            white: { bg: '#f3f4f6', card: '#ffffff', border: '#d1d5db', accent: '#e5e7eb', btnText: '#1f2937', text: '#111111', pill: 'rgba(0,0,0,0.06)' },
-            black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#3a475c', btnText: '#ffffff', text: '#ffffff', pill: 'rgba(255,255,255,0.08)' },
-            red: { bg: '#120202', card: '#1f0505', border: '#3d0a0a', accent: '#ff4444', btnText: '#000000', text: '#ffe5e5', pill: 'rgba(255,68,68,0.15)' },
-            green: { bg: '#021202', card: '#051f05', border: '#0a3d0a', accent: '#44ff44', btnText: '#000000', text: '#e5ffe5', pill: 'rgba(68,255,68,0.15)' },
-            blue: { bg: '#020b12', card: '#05141f', border: '#0a273d', accent: '#44a6ff', btnText: '#000000', text: '#e5f3ff', pill: 'rgba(68,166,255,0.15)' }
-        };
-
-        function setTheme(themeName) {
-            const root = document.documentElement; const t = themes[themeName];
-            root.style.setProperty('--bg-color', t.bg); root.style.setProperty('--card-bg', t.card);
-            root.style.setProperty('--border-color', t.border); root.style.setProperty('--accent-color', t.accent);
-            root.style.setProperty('--btn-text', t.btnText); root.style.setProperty('--text-color', t.text);
-            root.style.setProperty('--pill-bg', t.pill);
-            document.getElementById('secretSun').style.display = (themeName === 'black') ? 'block' : 'none';
-        }
-
-        // --- ЗАРЯДКА СОЛНЦА ---
-        let chargeTimer; let targetPhrase = "";
-        const adjectives = ["мокрая", "главный", "хитрый", "быстрый"]; const nouns = ["деревяшка", "огурец", "хакер", "носок"];
-        function startCharge() {
-            document.getElementById('secretSun').classList.add('charging');
-            chargeTimer = setTimeout(() => {
-                document.getElementById('secretSun').classList.remove('charging');
-                targetPhrase = `${adjectives[Math.floor(Math.random()*adjectives.length)]} ${nouns[Math.floor(Math.random()*nouns.length)]}`;
-                document.getElementById('captchaTarget').innerText = targetPhrase; switchPage('captcha', null);
-            }, 3000);
-        }
-        function stopCharge() { document.getElementById('secretSun').classList.remove('charging'); clearTimeout(chargeTimer); }
-        function checkAdminCaptcha() {
-            if (document.getElementById('captchaInput').value.trim().toLowerCase() === targetPhrase) {
-                document.getElementById('adminToggle').style.display = 'block'; switchPage('menu', document.getElementById('nav-menu'));
-            } else { alert('Ошибка!'); switchPage('menu', document.getElementById('nav-menu')); }
-        }
-        function toggleAdminPanel() {
-            const sidebar = document.getElementById('adminSidebar'); const btn = document.getElementById('adminToggle');
-            sidebar.classList.toggle('open'); btn.classList.toggle('panel-open');
-            btn.innerText = sidebar.classList.contains('open') ? '⬅' : '➔';
-        }
-
-        // --- ЛОГИКА ЕДИНОГО ТАЙМЕРА И РЕЖИМОВ ---
-        function tryActivateMode(mode) {
-            pendingMode = mode;
-            if (globalAdminTime.isBlocked) {
-                const checkValue = prompt(`Ваше время на сегодня кончилось! Попробуйте через 24 часа. Код обхода:`);
-                if (checkValue === "6767") activateMode(mode, true);
-                return;
-            }
-            mathNum1 = Math.floor(Math.random() * 10); mathNum2 = Math.floor(Math.random() * 10);
-            if(mathNum1 < mathNum2) { let temp = mathNum1; mathNum1 = mathNum2; mathNum2 = temp; }
-            mathCorrectAnswer = mathNum1 - mathNum2;
-            document.getElementById('mathQuestion').innerText = `Реши пример: ${mathNum1} - ${mathNum2} = ?`;
-            document.getElementById('mathAnswer').value = ""; document.getElementById('mathTestBlock').style.display = 'flex';
-        }
-
-        function verifyMathAnswer() {
-            const userIn = document.getElementById('mathAnswer').value.trim();
-            if (userIn === `${mathCorrectAnswer}6767`) {
-                document.getElementById('mathTestBlock').style.display = 'none'; activateMode(pendingMode, true); return;
-            }
-            if (parseInt(userIn) === mathCorrectAnswer) {
-                document.getElementById('mathTestBlock').style.display = 'none'; activateMode(pendingMode, false);
-            } else { document.getElementById('mathAnswer').style.border = "2px solid #ff3333"; }
-        }
-
-        function activateMode(mode, isInfinite) {
-            if (isInfinite) globalAdminTime.isInfinite = true;
-
-            // Сброс визуальных выделений в панели админа
-            document.getElementById('modeFreedomBtn').classList.remove('active-mode');
-            document.getElementById('modePaintBtn').classList.remove('active-mode');
-            canvas.classList.remove('drawing-active');
-            document.getElementById('paintPanel').style.display = 'none';
-
-            currentMode = mode;
-
-            if (mode === 'freedom') {
-                document.getElementById('modeFreedomBtn').classList.add('active-mode');
-                document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ffcc00, 0 0 30px #ffcc00');
-            } else if (mode === 'paint') {
-                document.getElementById('modePaintBtn').classList.add('active-mode');
-                document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ff33a6, 0 0 30px #ff33a6');
-                canvas.classList.add('drawing-active');
-                document.getElementById('paintPanel').style.setProperty('display', 'flex', 'important');
-            }
-
-            if (!globalAdminTime.isInfinite) startGlobalTimer();
-            else document.getElementById('adminTimer').style.display = 'none';
-            toggleAdminPanel();
-        }
-
-        function startGlobalTimer() {
-            if (countdownInterval) return; // Таймер уже тикает, не перезапускаем!
-            document.getElementById('adminTimer').style.display = 'block';
-            countdownInterval = setInterval(() => {
-                if (globalAdminTime.isInfinite) { clearInterval(countdownInterval); document.getElementById('adminTimer').style.display = 'none'; return; }
-                let s = globalAdminTime.timeLeft;
-                let m = parseInt(s / 60, 10); let sec = parseInt(s % 60, 10);
-                document.getElementById('adminTimer').innerText = `${m < 10 ? "0"+m : m}:${sec < 10 ? "0"+sec : sec}`;
-                if (--globalAdminTime.timeLeft < 0) {
-                    clearInterval(countdownInterval); document.getElementById('adminTimer').style.display = 'none';
-                    currentMode = null; globalAdminTime.isBlocked = true; resetAllDestructions();
-                    document.documentElement.style.setProperty('--freedom-glow', 'none');
-                    canvas.classList.remove('drawing-active'); document.getElementById('paintPanel').style.display = 'none';
-                    alert("Время истекло! Все админ-режимы заблокированы на 24 часа.");
-                }
-            }, 1000);
-        }
-
-        // --- ДВИЖОК РИСОВАНИЯ (ОБНОВЛЕННЫЙ) ---
-        function setMainTool(tool) {
-            currentMainTool = tool;
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            document.getElementById(`tool-${tool}`).classList.add('active');
-        }
-
-        function setupDrawingEngine() {
-            canvas.addEventListener('mousedown', startDraw);
-            canvas.addEventListener('mousemove', drawProcess);
-            canvas.addEventListener('mouseup', stopDraw);
-
-            canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, {passive:false});
-            canvas.addEventListener('touchmove', e => { e.preventDefault(); drawProcess(e.touches[0]); }, {passive:false});
-            canvas.addEventListener('touchend', stopDraw);
-
-            // Движок физики подтёков (анимация)
-            setInterval(() => {
-                if (activeDrips.length === 0) return;
-                activeDrips.forEach((drip, index) => {
-                    ctx.save();
-                    ctx.globalAlpha = drip.opacity;
-                    ctx.fillStyle = drip.color;
-                    ctx.beginPath();
-                    ctx.arc(drip.x, drip.y, drip.size, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
-                    
-                    drip.y += 0.8; // Скорость стекания капли вниз
-                    drip.size -= 0.005; // Сужение капли к низу
-                    drip.length--;
-                    if (drip.length <= 0 || drip.size <= 0.5) activeDrips.splice(index, 1);
-                });
-            }, 25);
-
-            function startDraw(e) {
-                if (currentMode !== 'paint') return;
-                isDrawing = true;
-                const rect = canvas.getBoundingClientRect();
-                lastX = e.clientX - rect.left; lastY = e.clientY - rect.top;
-
-                // Инструмент: Пипетка
-                if (currentMainTool === 'picker') {
-                    const imgData = ctx.getImageData(lastX, lastY, 1, 1).data;
-                    if (imgData[3] > 0) {
-                        const hex = "#" + ("000000" + ((imgData[0] << 16) | (imgData[1] << 8) | imgData[2]).toString(16)).slice(-6);
-                        document.getElementById('brushColor').value = hex;
-                    }
-                    isDrawing = false; return;
-                }
-
-                // Инструмент: Заливка
-                if (currentMainTool === 'bucket') {
-                    ctx.save();
-                    ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
-                    ctx.fillStyle = document.getElementById('brushColor').value;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                    isDrawing = false; return;
-                }
-
-                const bType = document.getElementById('brushTypeSelect').value;
-
-                // Тип: Губка (Рисует только единичным нажатием)
-                if (bType === 'sponge') {
-                    drawSpongeStamp(lastX, lastY);
-                    isDrawing = false;
-                }
-
-                // Тип: Баллончик (Физика зажатия)
-                if (bType === 'spray') {
-                    sprayX = lastX; sprayY = lastY; sprayHoldTime = 0;
-                    sprayInterval = setInterval(() => {
-                        sprayHoldTime += 30;
-                        drawSprayPoints(sprayX, sprayY);
-                        // Если зажали в одной точке больше 2.5 секунд - пускаем каплю!
-                        if (sprayHoldTime > 2500 && Math.random() < 0.15) {
-                            activeDrips.push({
-                                x: sprayX + (Math.random()*6 - 3), y: sprayY,
-                                size: (document.getElementById('brushSize').value / 6),
-                                color: document.getElementById('brushColor').value,
-                                opacity: document.getElementById('brushOpacity').value / 100,
-                                length: Math.floor(sprayHoldTime / 35) // Длина зависит от времени удержания
-                            });
-                        }
-                    }, 30);
-                }
-            }
-
-            function drawProcess(e) {
-                if (!isDrawing || currentMode !== 'paint') return;
-                const rect = canvas.getBoundingClientRect();
-                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-                const bType = document.getElementById('brushTypeSelect').value;
-
-                ctx.save();
-                ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
-                ctx.strokeStyle = document.getElementById('brushColor').value;
-                ctx.fillStyle = document.getElementById('brushColor').value;
-                ctx.lineWidth = document.getElementById('brushSize').value;
-                ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-
-                if (bType === 'classic') {
-                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
-                } else if (bType === 'eraser') {
-                    ctx.globalCompositeOperation = 'destination-out';
-                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
-                } else if (bType === 'spray') {
-                    sprayX = x; sprayY = y; // Обновляем координаты для распыления в движении
-                } else if (bType === 'destroyer') {
-                    // Мульти-стёрка сайта (Разрушает HTML элементы)
-                    canvas.classList.remove('drawing-active'); // На секунду пускаем луч под холст
-                    let elem = document.elementFromPoint(e.clientX, e.clientY);
-                    canvas.classList.add('drawing-active');
-                    if (elem && !elem.closest('.admin-sidebar') && !elem.closest('.admin-toggle-btn') && !elem.closest('.paint-panel') && elem !== document.body && elem !== canvas) {
-                        elem.style.visibility = 'hidden'; // Стираем элемент в небытие
-                    }
-                }
-
-                ctx.restore();
-                lastX = x; lastY = y;
-            }
-
-            function stopDraw() { isDrawing = false; clearInterval(sprayInterval); }
-
-            function drawSpongeStamp(cx, cy) {
-                const size = document.getElementById('brushSize').value * 2;
-                ctx.save();
-                ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
-                ctx.fillStyle = document.getElementById('brushColor').value;
-                // Рисуем текстурный круг имитируя поры губки
-                for (let i = 0; i < size * 3; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = Math.random() * (size / 2);
-                    const px = cx + Math.cos(angle) * radius;
-                    const py = cy + Math.sin(angle) * radius;
-                    const pSize = Math.random() * 3 + 1;
-                    if (Math.random() > 0.3) { // Пропуски структуры
-                        ctx.beginPath(); ctx.arc(px, py, pSize, 0, Math.PI * 2); ctx.fill();
-                    }
-                }
-                ctx.restore();
-            }
-
-            function drawSprayPoints(cx, cy) {
-                const size = document.getElementById('brushSize').value * 1.5;
-                ctx.save();
-                ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
-                ctx.fillStyle = document.getElementById('brushColor').value;
-                for (let i = 0; i < 15; i++) {
-                    const angle = Math.random() * Math.PI * 2;
-                    const radius = Math.random() * (size / 2);
-                    const px = cx + Math.cos(angle) * radius;
-                    const py = cy + Math.sin(angle) * radius;
-                    ctx.fillRect(px, py, 1.5, 1.5);
-                }
-                ctx.restore();
-            }
-        }
-
-        // Восстановление всех разрушений сайта и очистка холста
-        function resetAllDestructions() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            document.querySelectorAll('*').forEach(el => el.style.visibility = 'visible');
-            activeDrips = [];
-        }
-
-        // --- ДВИЖОК СВОБОДЫ (ПЕРЕТАСКИВАНИЕ/РЕДАКТИРОВАНИЕ) ---
-        function setupFreedomEngine() {
-            document.body.addEventListener('dblclick', function(e) {
-                if (currentMode !== 'freedom') return;
-                if (e.target.classList.contains('edit-target')) {
-                    const nextText = prompt("Новый текст:", e.target.innerText);
-                    if (nextText !== null) e.target.innerText = nextText;
-                }
-            });
-
-            let pressTimer; let dragElement = null; let startX = 0, startY = 0;
-            document.body.addEventListener('mousedown', onPointerDown);
-            document.body.addEventListener('touchstart', onPointerDown, {passive: false});
-
-            function onPointerDown(e) {
-                if (currentMode !== 'freedom') return;
-                const target = e.target.closest('.drag-target'); if (!target) return;
-                const pageX = e.touches ? e.touches[0].pageX : e.pageX;
-                const pageY = e.touches ? e.touches[0].pageY : e.pageY;
-
-                pressTimer = setTimeout(() => {
-                    dragElement = target; const rect = dragElement.getBoundingClientRect();
-                    startX = pageX - (rect.left + window.scrollX); startY = pageY - (rect.top + window.scrollY);
-                    dragElement.style.width = rect.width + 'px'; dragElement.style.height = rect.height + 'px';
-                    dragElement.classList.add('drag-active'); moveElement(pageX, pageY);
-                }, 2000);
-            }
-
-            function moveElement(x, y) { if (!dragElement) return; dragElement.style.left = (x - startX) + 'px'; dragElement.style.top = (y - startY) + 'px'; }
-            document.body.addEventListener('mousemove', (e) => { if (!dragElement) return; moveElement(e.pageX, e.pageY); });
-            document.body.addEventListener('touchmove', (e) => { if (!dragElement) return; moveElement(e.touches[0].pageX, e.touches[0].pageY); }, {passive: false});
-            document.body.addEventListener('mouseup', onPointerUp); document.body.addEventListener('touchend', onPointerUp);
-
-            function onPointerUp() { clearTimeout(pressTimer); if (dragElement) { dragElement.classList.remove('drag-active'); dragElement.style.position = 'absolute'; dragElement = null; } }
-        }
-    </script>
-</body>
-</html>
+            document.getElementById('copyBtnObj').innerText = '✓'; setTimeout(() => document.
