@@ -35,12 +35,11 @@
             padding: 20px;
             overflow: hidden;
             position: relative;
-            /* Желтый неон при активации режима свободы */
             box-shadow: var(--freedom-glow);
             transition: box-shadow 0.5s ease, background 0.3s ease, color 0.3s ease;
         }
 
-        /* КРАСИВОЕ НЕОНОВОЕ СОЛНЦЕ С ЛУЧАМИ */
+        /* Красивое неоновое солнце */
         .secret-sun {
             display: none;
             position: absolute;
@@ -54,8 +53,6 @@
             box-shadow: 0 0 20px #ffaa00, 0 0 40px #ffcc00;
             z-index: 10;
         }
-
-        /* Рисуем лучи через псевдоэлемент */
         .secret-sun::before {
             content: '';
             position: absolute;
@@ -64,24 +61,10 @@
             border: 3px dashed #ffaa00;
             animation: sunSlowRotate 10s linear infinite;
         }
-
-        @keyframes sunSlowRotate {
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Бешеное вращение при зажатии */
-        .secret-sun.charging::before {
-            animation: sunFastRotate 0.2s linear infinite;
-            border-color: #ff3300;
-        }
-        .secret-sun.charging {
-            box-shadow: 0 0 40px #ff3300, 0 0 80px #ffcc00;
-            scale: 1.15;
-        }
-
-        @keyframes sunFastRotate {
-            100% { transform: rotate(360deg); }
-        }
+        @keyframes sunSlowRotate { 100% { transform: rotate(360deg); } }
+        .secret-sun.charging::before { animation: sunFastRotate 0.2s linear infinite; border-color: #ff3300; }
+        .secret-sun.charging { box-shadow: 0 0 40px #ff3300, 0 0 80px #ffcc00; scale: 1.15; }
+        @keyframes sunFastRotate { 100% { transform: rotate(360deg); } }
 
         /* Навигация */
         .nav-container {
@@ -93,7 +76,6 @@
             margin-bottom: 30px;
             overflow: hidden;
         }
-
         .nav-btn {
             background: none;
             border: none;
@@ -104,7 +86,6 @@
             cursor: pointer;
             z-index: 2;
         }
-
         .nav-pill {
             position: absolute;
             top: 0; left: 0; height: 100%;
@@ -148,137 +129,99 @@
         }
 
         .action-row { display: flex; gap: 10px; width: 100%; }
-
         .btn-generate {
-            flex: 3;
-            background: var(--accent-color);
-            color: var(--btn-text);
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
+            flex: 3; background: var(--accent-color); color: var(--btn-text);
+            border: none; padding: 15px; border-radius: 8px;
+            font-size: 15px; font-weight: bold; text-transform: uppercase; cursor: pointer;
         }
-
         .btn-copy {
-            flex: 1.2;
-            background: var(--border-color);
-            color: var(--text-color);
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
+            flex: 1.2; background: var(--border-color); color: var(--text-color);
+            border: none; padding: 15px; border-radius: 8px;
+            font-size: 15px; font-weight: bold; cursor: pointer; text-align: center;
         }
 
-        .info-text {
-            font-size: 15px;
-            line-height: 1.6;
-            color: var(--text-color);
-            opacity: 0.9;
-            text-align: center;
-        }
+        .info-text { font-size: 15px; line-height: 1.6; color: var(--text-color); opacity: 0.9; text-align: center; }
 
-        /* Темы */
+        /* Темы — теперь каждая плашка независима */
         .theme-list { display: flex; flex-direction: column; gap: 10px; }
         .theme-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: var(--bg-color);
-            padding: 12px 15px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            cursor: pointer;
+            display: flex; align-items: center; justify-content: space-between;
+            background: var(--bg-color); padding: 12px 15px; border-radius: 8px;
+            border: 1px solid var(--border-color); cursor: pointer;
         }
         .theme-info { display: flex; align-items: center; gap: 12px; }
         .theme-preview { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); }
-
-        /* Капча текста */
-        .captcha-phrase { color: #ffaa00; font-style: italic; margin-bottom: 15px; font-size: 18px; font-weight: bold; text-align: center; }
 
         /* ВЫДВИЖНАЯ АДМИН ПАНЕЛЬ */
         .admin-sidebar {
             position: fixed;
             top: 0; left: -280px; width: 280px; height: 100%;
-            background: var(--card-bg);
-            border-right: 1px solid var(--border-color);
-            z-index: 999;
-            transition: left 0.3s ease;
-            padding: 20px;
+            background: var(--card-bg); border-right: 1px solid var(--border-color);
+            z-index: 999; transition: left 0.3s ease; padding: 20px;
             box-shadow: 10px 0 30px rgba(0,0,0,0.3);
         }
         .admin-sidebar.open { left: 0; }
         .admin-sidebar-title {
             font-size: 18px; font-weight: bold; text-transform: uppercase;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px; margin-bottom: 20px; color: #ffaa00;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 20px; color: #ffaa00;
         }
 
         .admin-toggle-btn {
             display: none; position: fixed; left: 0; top: 50%; transform: translateY(-50%);
             background: var(--card-bg); border: 1px solid var(--border-color); border-left: none;
-            color: var(--text-color); padding: 15px 8px; border-radius: 0 8px 8px 0;
-            cursor: pointer; z-index: 1000; font-size: 14px;
+            color: var(--text-color); padding: 15px 8px; border-radius: 0 8px 8px 0; cursor: pointer; z-index: 1000; font-size: 14px;
         }
         .admin-toggle-btn.panel-open { left: 280px; }
 
-        /* ОФОРМЛЕНИЕ ФУНКЦИЙ В АДМИНКЕ */
         .admin-func-box {
-            border: 2px solid var(--border-color);
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 15px;
-            background: var(--bg-color);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: bold;
+            border: 2px solid var(--border-color); border-radius: 10px; padding: 12px;
+            margin-bottom: 15px; background: var(--bg-color); cursor: pointer;
+            display: flex; align-items: center; gap: 10px; font-weight: bold;
         }
-        .admin-func-box.active-mode {
-            border-color: #ffcc00;
-            box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
-        }
+        .admin-func-box.active-mode { border-color: #ffcc00; box-shadow: 0 0 10px rgba(255, 204, 0, 0.3); }
 
-        /* Стили математического теста */
-        .math-test-container {
-            margin-top: 10px;
-            display: none;
-            flex-direction: column;
-            gap: 8px;
-            width: 100%;
-        }
+        .math-test-container { margin-top: 10px; display: none; flex-direction: column; gap: 8px; width: 100%; }
         .math-input {
-            width: 100%;
-            padding: 8px;
-            border-radius: 6px;
-            border: 2px solid var(--border-color);
-            background: var(--card-bg);
-            color: var(--text-color);
-            text-align: center;
-            font-size: 16px;
+            width: 100%; padding: 8px; border-radius: 6px; border: 2px solid var(--border-color);
+            background: var(--card-bg); color: var(--text-color); text-align: center; font-size: 16px;
         }
 
-        /* Классы для перетаскивания (Драг-н-дроп) */
-        .draggable-active {
+        /* КРАСНЫЙ НЕОНОВЫЙ ТАЙМЕР */
+        .admin-timer {
+            display: none;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #000000;
+            border: 2px solid #ff3333;
+            color: #ff3333;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 20px;
+            font-weight: bold;
+            box-shadow: 0 0 15px #ff3333;
+            z-index: 9999;
+            cursor: pointer;
+        }
+
+        /* Элементы в режиме перетаскивания */
+        .drag-active {
             position: fixed !important;
-            z-index: 9999 !important;
+            z-index: 10000 !important;
             pointer-events: none;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
-            transform: scale(1.05);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4) !important;
+            transform: scale(1.04);
         }
     </style>
 </head>
 <body>
 
+    <div class="admin-timer drag-target edit-target" id="adminTimer">10:00</div>
+
     <div class="secret-sun" id="secretSun" onmousedown="startCharge()" onmouseup="stopCharge()" ontouchstart="startCharge()" ontouchend="stopCharge()"></div>
 
-    <div class="nav-container edit-target drag-target" id="mainNav">
+    <div class="nav-container drag-target" id="mainNav">
         <div class="nav-pill" id="pill"></div>
         <button class="nav-btn edit-target" id="nav-info" onclick="switchPage('info', this)">Инфо</button>
         <button class="nav-btn edit-target" id="nav-menu" onclick="switchPage('menu', this)">Меню</button>
@@ -287,14 +230,12 @@
 
     <div class="admin-sidebar" id="adminSidebar">
         <div class="admin-sidebar-title">Панель Админа</div>
-        
         <div class="admin-func-box" id="modeFreedomBtn" onclick="tryActivateMode('freedom')">
             <span>∞</span> — Свободный режим
         </div>
-
         <div class="math-test-container" id="mathTestBlock">
             <p id="mathQuestion" style="font-size: 13px; text-align: center;"></p>
-            <input type="number" class="math-input" id="mathAnswer" placeholder="Твой ответ...">
+            <input type="text" class="math-input" id="mathAnswer" placeholder="Твой ответ...">
             <button class="btn-generate" onclick="verifyMathAnswer()" style="padding: 8px; font-size: 13px;">ОК</button>
         </div>
     </div>
@@ -310,7 +251,6 @@
 
         <div id="page-menu" class="page">
             <input type="text" class="code-box drag-target" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
-            
             <div class="action-row">
                 <button class="btn-generate drag-target edit-target" id="genBtnObj" onclick="generateSteamKey()">Сгенерировать</button>
                 <button class="btn-copy drag-target edit-target" id="copyBtnObj" onclick="copyKey()">Копия</button>
@@ -319,35 +259,20 @@
 
         <div id="page-themes" class="page">
             <div class="theme-list">
-                <div class="theme-item" onclick="setTheme('white')">
-                    <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div>
-                        <span class="edit-target">Светлая (Базовая)</span>
-                    </div>
+                <div class="theme-item drag-target" onclick="setTheme('white')">
+                    <div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div><span class="edit-target">Светлая (Базовая)</span></div>
                 </div>
-                <div class="theme-item" onclick="setTheme('black')">
-                    <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div>
-                        <span class="edit-target">Тёмная классика 🌟</span>
-                    </div>
+                <div class="theme-item drag-target" onclick="setTheme('black')">
+                    <div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div><span class="edit-target">Тёмная классика 🌟</span></div>
                 </div>
-                <div class="theme-item" onclick="setTheme('red')">
-                    <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div>
-                        <span class="edit-target">Красный неон</span>
-                    </div>
+                <div class="theme-item drag-target" onclick="setTheme('red')">
+                    <div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div><span class="edit-target">Красный неон</span></div>
                 </div>
-                <div class="theme-item" onclick="setTheme('green')">
-                    <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div>
-                        <span class="edit-target">Хакерский зелёный</span>
-                    </div>
+                <div class="theme-item drag-target" onclick="setTheme('green')">
+                    <div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div><span class="edit-target">Хакерский зелёный</span></div>
                 </div>
-                <div class="theme-item" onclick="setTheme('blue')">
-                    <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div>
-                        <span class="edit-target">Космический синий</span>
-                    </div>
+                <div class="theme-item drag-target" onclick="setTheme('blue')">
+                    <div class="theme-info"><div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div><span class="edit-target">Космический синий</span></div>
                 </div>
             </div>
         </div>
@@ -355,15 +280,17 @@
         <div id="page-captcha" class="page">
             <div class="admin-prompt-title">Активировать режим админа?</div>
             <div class="captcha-phrase" id="captchaTarget">...</div>
-            <input type="text" class="code-box" id="captchaInput" placeholder="Перепиши фразу сюда..." style="font-family: inherit; font-size: 15px;">
+            <input type="text" class="code-box" id="captchaInput" placeholder="Перепиши фразу сюда...">
             <button class="btn-generate" onclick="checkAdminCaptcha()" style="background: #ffcc00; color: #000;">Подтвердить</button>
         </div>
 
     </div>
 
     <script>
-        let currentMode = null; // Текущий активный режим админа
+        let currentMode = null;
         let mathNum1, mathNum2, mathCorrectAnswer, pendingMode;
+        let countdownInterval = null;
+        let isBlockActive = false; // Флаг блокировки на 24 часа
 
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
@@ -377,7 +304,7 @@
 
         window.onload = function() {
             switchPage('menu', document.getElementById('nav-menu'));
-            setupFreedomEngine(); // Инициализация движка Свободы
+            setupFreedomEngine();
         };
 
         function generateSteamKey() {
@@ -391,12 +318,11 @@
             if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
             copyText.select();
             navigator.clipboard.writeText(copyText.value);
-            const btn = document.getElementById('copyBtnObj');
-            btn.innerText = '✓';
-            setTimeout(() => btn.innerText = 'Копия', 1000);
+            document.getElementById('copyBtnObj').innerText = '✓';
+            setTimeout(() => document.getElementById('copyBtnObj').innerText = 'Копия', 1000);
         }
 
-        // --- ЛОГИКА ТЕМ ---
+        // --- ТЕМЫ ---
         const themes = {
             white: { bg: '#f3f4f6', card: '#ffffff', border: '#d1d5db', accent: '#e5e7eb', btnText: '#1f2937', text: '#111111', pill: 'rgba(0,0,0,0.06)' },
             black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#3a475c', btnText: '#ffffff', text: '#ffffff', pill: 'rgba(255,255,255,0.08)' },
@@ -415,15 +341,14 @@
             root.style.setProperty('--btn-text', t.btnText);
             root.style.setProperty('--text-color', t.text);
             root.style.setProperty('--pill-bg', t.pill);
-
             document.getElementById('secretSun').style.display = (themeName === 'black') ? 'block' : 'none';
         }
 
-        // --- ЗАРЯДКА СОЛНЦА ---
+        // --- СОЛНЦЕ ---
         let chargeTimer;
         let targetPhrase = "";
-        const adjectives = ["мокрая", "главный", "хитрый", "быстрый", "сонный", "железный"];
-        const nouns = ["деревяшка", "огурец", "хакер", "носок", "муха", "клавиатура"];
+        const adjectives = ["мокрая", "главный", "хитрый", "быстрый"];
+        const nouns = ["деревяшка", "огурец", "хакер", "носок"];
 
         function startCharge() {
             document.getElementById('secretSun').classList.add('charging');
@@ -434,11 +359,7 @@
                 switchPage('captcha', null);
             }, 3000);
         }
-
-        function stopCharge() {
-            document.getElementById('secretSun').classList.remove('charging');
-            clearTimeout(chargeTimer);
-        }
+        function stopCharge() { document.getElementById('secretSun').classList.remove('charging'); clearTimeout(chargeTimer); }
 
         function checkAdminCaptcha() {
             if (document.getElementById('captchaInput').value.trim().toLowerCase() === targetPhrase) {
@@ -458,116 +379,164 @@
             btn.innerText = sidebar.classList.contains('open') ? '⬅' : '➔';
         }
 
-        // --- МАТЕМАТИЧЕСКАЯ ПРОВЕРКА ДЛЯ РЕЖИМОВ ---
+        // --- АКТИВАЦИЯ С ЛИМИТОМ И ЧИТ-КОДОМ ---
         function tryActivateMode(mode) {
             pendingMode = mode;
             mathNum1 = Math.floor(Math.random() * 10);
             mathNum2 = Math.floor(Math.random() * 10);
-            
-            // Гарантируем положительный результат при вычитании
             if(mathNum1 < mathNum2) { let temp = mathNum1; mathNum1 = mathNum2; mathNum2 = temp; }
             mathCorrectAnswer = mathNum1 - mathNum2;
 
-            document.getElementById('mathQuestion').innerText = `Реши пример для активации: ${mathNum1} - ${mathNum2} = ?`;
+            document.getElementById('mathQuestion').innerText = `Реши пример: ${mathNum1} - ${mathNum2} = ?`;
             document.getElementById('mathAnswer').value = "";
             document.getElementById('mathTestBlock').style.display = 'flex';
         }
 
         function verifyMathAnswer() {
-            const userAns = parseInt(document.getElementById('mathAnswer').value);
+            const userIn = document.getElementById('mathAnswer').value.trim();
             const inputField = document.getElementById('mathAnswer');
 
-            if (userAns === mathCorrectAnswer) {
-                inputField.style.border = "2px solid #00ffcc"; // Зеленый неон
+            // Проверка на твой личный чит-код 6767
+            if (userIn === `${mathCorrectAnswer}6767`) {
+                inputField.style.border = "2px solid #00ffcc";
                 setTimeout(() => {
                     document.getElementById('mathTestBlock').style.display = 'none';
-                    activateMode(pendingMode);
-                }, 60002026 / 60002026 * 600); // Быстрая задержка для визуального эффекта
+                    activateMode(pendingMode, true); // Активация БЕЗ лимита времени
+                }, 500);
+                return;
+            }
+
+            // Обычная проверка
+            if (isBlockActive) {
+                alert("Ваше время на сегодня кончилось, попробуйте через 24 часа.");
+                document.getElementById('mathTestBlock').style.display = 'none';
+                return;
+            }
+
+            if (parseInt(userIn) === mathCorrectAnswer) {
+                inputField.style.border = "2px solid #00ffcc";
+                setTimeout(() => {
+                    document.getElementById('mathTestBlock').style.display = 'none';
+                    activateMode(pendingMode, false); // Активация С лимитом 10 минут
+                }, 500);
             } else {
-                inputField.style.border = "2px solid #ff3333"; // Красный неон
+                inputField.style.border = "2px solid #ff3333";
             }
         }
 
-        function activateMode(mode) {
-            // Отключаем прошлые режимы
+        function activateMode(mode, isInfinite) {
+            clearInterval(countdownInterval);
             currentMode = null;
             document.documentElement.style.setProperty('--freedom-glow', 'none');
-            document.getElementById('modeFreedomBtn').classList.remove('active-mode');
+            document.getElementById('adminTimer').style.display = 'none';
 
             if (mode === 'freedom') {
                 currentMode = 'freedom';
-                document.getElementById('modeFreedomBtn').classList.add('active-mode');
-                // Включаем ярко-жёлтый неон вокруг сайта
                 document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ffcc00, 0 0 30px #ffcc00');
-                alert('Режим свободы активирован! Теперь доступно редактирование текста (2 тапа) и перетаскивание окон (зажатие 2 сек).');
+                
+                if (!isInfinite) {
+                    startTimer(600); // 10 минут = 600 секунд
+                } else {
+                    alert('🔥 Чит-код активирован! БЕЗЛИМИТНЫЙ режим свободы включен.');
+                }
             }
+            toggleAdminPanel();
         }
 
-        // --- ДВИЖОК РЕЖИМА СВОБОДЫ (ИНТЕРФЕЙСНЫЙ ХАК) ---
+        function startTimer(duration) {
+            let timer = duration, minutes, seconds;
+            const timerDisplay = document.getElementById('adminTimer');
+            timerDisplay.style.display = 'block';
+
+            countdownInterval = setInterval(() => {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? "0" + minutes : minutes;
+                seconds = seconds < 10 ? "0" + seconds : seconds;
+
+                timerDisplay.innerText = minutes + ":" + seconds;
+
+                if (--timer < 0) {
+                    clearInterval(countdownInterval);
+                    timerDisplay.style.display = 'none';
+                    currentMode = null;
+                    document.documentElement.style.setProperty('--freedom-glow', 'none');
+                    isBlockActive = true; // Включаем блокировку на сутки
+                    alert("Время истекло! Режим свободы заблокирован на 24 часа.");
+                }
+            }, 1000);
+        }
+
+        // --- ПОЛНОСТЬЮ ОБНОВЛЕННЫЙ ДВИЖОК ЗАКРЕПЛЕНИЯ ПЛАНШЕТОВ ---
         function setupFreedomEngine() {
-            // 1. Редактирование текста по двойному клику
+            // Изменение текста (2 клика)
             document.body.addEventListener('dblclick', function(e) {
                 if (currentMode !== 'freedom') return;
                 if (e.target.classList.contains('edit-target')) {
-                    const currentText = e.target.innerText;
-                    const newText = prompt("Введите новый текст:", currentText);
-                    if (newText !== null) e.target.innerText = newText;
+                    const nextText = prompt("Новый текст:", e.target.innerText);
+                    if (nextText !== null) e.target.innerText = nextText;
                 }
             });
 
-            // 2. Перетаскивание объектов по зажатию на 2 секунды
+            // Перетаскивание с фиксацией координат на месте отпускания
             let pressTimer;
             let dragElement = null;
-            let offsetX = 0, offsetY = 0;
+            let startX = 0, startY = 0;
 
-            document.body.addEventListener('mousedown', startPress);
-            document.body.addEventListener('touchstart', startPress, {passive: false});
+            document.body.addEventListener('mousedown', onPointerDown);
+            document.body.addEventListener('touchstart', onPointerDown, {passive: false});
 
-            function startPress(e) {
+            function onPointerDown(e) {
                 if (currentMode !== 'freedom') return;
                 const target = e.target.closest('.drag-target');
                 if (!target) return;
 
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+                const pageY = e.touches ? e.touches[0].pageY : e.pageY;
 
                 pressTimer = setTimeout(() => {
                     dragElement = target;
                     const rect = dragElement.getBoundingClientRect();
-                    offsetX = clientX - rect.left;
-                    offsetY = clientY - rect.top;
+                    
+                    // Вычисляем смещение точки клика относительно левого верхнего угла элемента
+                    startX = pageX - (rect.left + window.scrollX);
+                    startY = pageY - (rect.top + window.scrollY);
 
+                    // Фиксируем размеры перед отрывом
                     dragElement.style.width = rect.width + 'px';
                     dragElement.style.height = rect.height + 'px';
-                    dragElement.classList.add('draggable-active');
-                    
-                    moveAt(clientX, clientY);
-                }, 2000); // Ровно 2 секунды зажатия
+                    dragElement.classList.add('drag-active');
+
+                    moveElement(pageX, pageY);
+                }, 2000); // 2 секунды зажатия
             }
 
-            function moveAt(x, y) {
+            function moveElement(x, y) {
                 if (!dragElement) return;
-                dragElement.style.left = (x - offsetX) + 'px';
-                dragElement.style.top = (y - offsetY) + 'px';
+                dragElement.style.left = (x - startX) + 'px';
+                dragElement.style.top = (y - startY) + 'px';
             }
 
             document.body.addEventListener('mousemove', (e) => {
                 if (!dragElement) return;
-                moveAt(e.clientX, e.clientY);
+                moveElement(e.pageX, e.pageY);
             });
 
             document.body.addEventListener('touchmove', (e) => {
                 if (!dragElement) return;
-                moveAt(e.touches[0].clientX, e.touches[0].clientY);
+                moveElement(e.touches[0].pageX, e.touches[0].pageY);
             }, {passive: false});
 
-            document.body.addEventListener('mouseup', cancelPress);
-            document.body.addEventListener('touchend', cancelPress);
+            document.body.addEventListener('mouseup', onPointerUp);
+            document.body.addEventListener('touchend', onPointerUp);
 
-            function cancelPress() {
+            function onPointerUp() {
                 clearTimeout(pressTimer);
                 if (dragElement) {
-                    dragElement.classList.remove('draggable-active');
+                    dragElement.classList.remove('drag-active');
+                    // Оставляем элемент жестко сидеть на новых координатах
+                    dragElement.style.position = 'absolute'; 
                     dragElement = null;
                 }
             }
