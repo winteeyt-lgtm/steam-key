@@ -2,10 +2,9 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Steam Key Generator</title>
     <style>
-        /* Переменные для тем — Базовая тема теперь СВЕТЛАЯ */
         :root {
             --bg-color: #f3f4f6;
             --card-bg: #ffffff;
@@ -14,6 +13,7 @@
             --btn-text: #1f2937;
             --text-color: #111111;
             --pill-bg: rgba(0, 0, 0, 0.06);
+            --freedom-glow: none;
         }
 
         * {
@@ -21,7 +21,6 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Arial, sans-serif;
-            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
             -webkit-tap-highlight-color: transparent;
         }
 
@@ -34,40 +33,59 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
+            overflow: hidden;
             position: relative;
+            /* Желтый неон при активации режима свободы */
+            box-shadow: var(--freedom-glow);
+            transition: box-shadow 0.5s ease, background 0.3s ease, color 0.3s ease;
         }
 
-        /* Секретное Неоновое Солнце — скрыто по умолчанию */
+        /* КРАСИВОЕ НЕОНОВОЕ СОЛНЦЕ С ЛУЧАМИ */
         .secret-sun {
             display: none;
             position: absolute;
             top: 25px;
             right: 25px;
-            width: 35px;
-            height: 35px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: #ffcc00;
             cursor: pointer;
-            box-shadow: 0 0 15px #ffaa00, 0 0 30px #ffcc00;
-            animation: sunRotate 6s linear infinite;
+            box-shadow: 0 0 20px #ffaa00, 0 0 40px #ffcc00;
+            z-index: 10;
         }
 
-        @keyframes sunRotate {
+        /* Рисуем лучи через псевдоэлемент */
+        .secret-sun::before {
+            content: '';
+            position: absolute;
+            top: -5px; left: -5px; right: -5px; bottom: -5px;
+            border-radius: 50%;
+            border: 3px dashed #ffaa00;
+            animation: sunSlowRotate 10s linear infinite;
+        }
+
+        @keyframes sunSlowRotate {
             100% { transform: rotate(360deg); }
         }
 
-        /* Бешеное вращение при удержании */
+        /* Бешеное вращение при зажатии */
+        .secret-sun.charging::before {
+            animation: sunFastRotate 0.2s linear infinite;
+            border-color: #ff3300;
+        }
         .secret-sun.charging {
-            animation: sunRotate 0.2s linear infinite;
-            box-shadow: 0 0 30px #ff0000, 0 0 60px #ffcc00;
-            scale: 1.2;
+            box-shadow: 0 0 40px #ff3300, 0 0 80px #ffcc00;
+            scale: 1.15;
         }
 
-        /* Навигация с ровной таблеткой */
+        @keyframes sunFastRotate {
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Навигация */
         .nav-container {
             background: var(--card-bg);
-            padding: 0;
             border-radius: 50px;
             border: 1px solid var(--border-color);
             display: inline-flex;
@@ -89,16 +107,14 @@
 
         .nav-pill {
             position: absolute;
-            top: 0;
-            left: 0;
-            height: 100%;
+            top: 0; left: 0; height: 100%;
             background: var(--pill-bg);
             border-radius: 50px;
             z-index: 1;
             transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Главный контейнер */
+        /* Главная карточка */
         .main-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -113,13 +129,8 @@
             justify-content: center;
         }
 
-        .page {
-            display: none;
-        }
-
-        .page.active {
-            display: block;
-        }
+        .page { display: none; }
+        .page.active { display: block; }
 
         .code-box {
             width: 100%;
@@ -136,11 +147,7 @@
             margin-bottom: 16px;
         }
 
-        .action-row {
-            display: flex;
-            gap: 10px;
-            width: 100%;
-        }
+        .action-row { display: flex; gap: 10px; width: 100%; }
 
         .btn-generate {
             flex: 3;
@@ -168,10 +175,6 @@
             text-align: center;
         }
 
-        .btn-generate:active, .btn-copy:active {
-            transform: scale(0.97);
-        }
-
         .info-text {
             font-size: 15px;
             line-height: 1.6;
@@ -181,12 +184,7 @@
         }
 
         /* Темы */
-        .theme-list {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
+        .theme-list { display: flex; flex-direction: column; gap: 10px; }
         .theme-item {
             display: flex;
             align-items: center;
@@ -197,44 +195,16 @@
             border: 1px solid var(--border-color);
             cursor: pointer;
         }
+        .theme-info { display: flex; align-items: center; gap: 12px; }
+        .theme-preview { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.15); }
 
-        .theme-info {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .theme-preview {
-            width: 24px;
-            height: 24px;
-            border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.15);
-        }
-
-        /* Страница проверки */
-        .admin-prompt-title {
-            font-size: 16px;
-            font-weight: bold;
-            margin-bottom: 12px;
-            text-align: center;
-        }
-        
-        .captcha-phrase {
-            color: #ffaa00;
-            font-style: italic;
-            margin-bottom: 15px;
-            font-size: 18px;
-            font-weight: bold;
-            text-align: center;
-        }
+        /* Капча текста */
+        .captcha-phrase { color: #ffaa00; font-style: italic; margin-bottom: 15px; font-size: 18px; font-weight: bold; text-align: center; }
 
         /* ВЫДВИЖНАЯ АДМИН ПАНЕЛЬ */
         .admin-sidebar {
             position: fixed;
-            top: 0;
-            left: -280px;
-            width: 280px;
-            height: 100%;
+            top: 0; left: -280px; width: 280px; height: 100%;
             background: var(--card-bg);
             border-right: 1px solid var(--border-color);
             z-index: 999;
@@ -242,124 +212,149 @@
             padding: 20px;
             box-shadow: 10px 0 30px rgba(0,0,0,0.3);
         }
-
-        .admin-sidebar.open {
-            left: 0;
-        }
-
+        .admin-sidebar.open { left: 0; }
         .admin-sidebar-title {
-            font-size: 18px;
-            font-weight: bold;
-            text-transform: uppercase;
+            font-size: 18px; font-weight: bold; text-transform: uppercase;
             border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-            color: #ffaa00;
+            padding-bottom: 10px; margin-bottom: 20px; color: #ffaa00;
         }
 
         .admin-toggle-btn {
-            display: none;
-            position: fixed;
-            left: 0;
-            top: 50%;
-            transform: translateY(-50%);
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-left: none;
-            color: var(--text-color);
-            padding: 15px 8px;
-            border-radius: 0 8px 8px 0;
+            display: none; position: fixed; left: 0; top: 50%; transform: translateY(-50%);
+            background: var(--card-bg); border: 1px solid var(--border-color); border-left: none;
+            color: var(--text-color); padding: 15px 8px; border-radius: 0 8px 8px 0;
+            cursor: pointer; z-index: 1000; font-size: 14px;
+        }
+        .admin-toggle-btn.panel-open { left: 280px; }
+
+        /* ОФОРМЛЕНИЕ ФУНКЦИЙ В АДМИНКЕ */
+        .admin-func-box {
+            border: 2px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 15px;
+            background: var(--bg-color);
             cursor: pointer;
-            z-index: 1000;
-            font-size: 14px;
-            transition: left 0.3s ease, transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: bold;
+        }
+        .admin-func-box.active-mode {
+            border-color: #ffcc00;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.3);
         }
 
-        .admin-toggle-btn.panel-open {
-            left: 280px;
+        /* Стили математического теста */
+        .math-test-container {
+            margin-top: 10px;
+            display: none;
+            flex-direction: column;
+            gap: 8px;
+            width: 100%;
+        }
+        .math-input {
+            width: 100%;
+            padding: 8px;
+            border-radius: 6px;
+            border: 2px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-color);
+            text-align: center;
+            font-size: 16px;
+        }
+
+        /* Классы для перетаскивания (Драг-н-дроп) */
+        .draggable-active {
+            position: fixed !important;
+            z-index: 9999 !important;
+            pointer-events: none;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3) !important;
+            transform: scale(1.05);
         }
     </style>
 </head>
 <body>
 
-    <!-- Секретное Солнце (появляется только на темной теме) -->
     <div class="secret-sun" id="secretSun" onmousedown="startCharge()" onmouseup="stopCharge()" ontouchstart="startCharge()" ontouchend="stopCharge()"></div>
 
-    <!-- Навигация -->
-    <div class="nav-container" id="mainNav">
+    <div class="nav-container edit-target drag-target" id="mainNav">
         <div class="nav-pill" id="pill"></div>
-        <button class="nav-btn" id="nav-info" onclick="switchPage('info', this)">Инфо</button>
-        <button class="nav-btn" id="nav-menu" onclick="switchPage('menu', this)">Меню</button>
-        <button class="nav-btn" id="nav-themes" onclick="switchPage('themes', this)">Темы</button>
+        <button class="nav-btn edit-target" id="nav-info" onclick="switchPage('info', this)">Инфо</button>
+        <button class="nav-btn edit-target" id="nav-menu" onclick="switchPage('menu', this)">Меню</button>
+        <button class="nav-btn edit-target" id="nav-themes" onclick="switchPage('themes', this)">Темы</button>
     </div>
 
-    <!-- Боковая панель -->
     <div class="admin-sidebar" id="adminSidebar">
         <div class="admin-sidebar-title">Панель Админа</div>
-        <p style="color: #888; font-size: 13px; text-align: center;">Панель готова. Жду новые безумные фишки!</p>
+        
+        <div class="admin-func-box" id="modeFreedomBtn" onclick="tryActivateMode('freedom')">
+            <span>∞</span> — Свободный режим
+        </div>
+
+        <div class="math-test-container" id="mathTestBlock">
+            <p id="mathQuestion" style="font-size: 13px; text-align: center;"></p>
+            <input type="number" class="math-input" id="mathAnswer" placeholder="Твой ответ...">
+            <button class="btn-generate" onclick="verifyMathAnswer()" style="padding: 8px; font-size: 13px;">ОК</button>
+        </div>
     </div>
     <button class="admin-toggle-btn" id="adminToggle" onclick="toggleAdminPanel()">➔</button>
 
-    <!-- Основная карточка -->
-    <div class="main-card">
+    <div class="main-card drag-target" id="mainCard">
         
-        <!-- ИНФО -->
         <div id="page-info" class="page">
-            <p class="info-text">
+            <p class="info-text edit-target" id="infoTxtElement">
                 На этом сайте генерируются случайные символы для ключа от игры Steam. С шансом 99.99999% сгенерируется неверный код, но всегда останется тот самый 0.00001% на рабочую игру! Удачи!
             </p>
         </div>
 
-        <!-- МЕНЮ -->
         <div id="page-menu" class="page">
-            <input type="text" class="code-box" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
+            <input type="text" class="code-box drag-target" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
             
             <div class="action-row">
-                <button class="btn-generate" onclick="generateSteamKey()">Сгенерировать</button>
-                <button class="btn-copy" id="copyBtn" onclick="copyKey()">Копия</button>
+                <button class="btn-generate drag-target edit-target" id="genBtnObj" onclick="generateSteamKey()">Сгенерировать</button>
+                <button class="btn-copy drag-target edit-target" id="copyBtnObj" onclick="copyKey()">Копия</button>
             </div>
         </div>
 
-        <!-- ТЕМЫ -->
         <div id="page-themes" class="page">
             <div class="theme-list">
                 <div class="theme-item" onclick="setTheme('white')">
                     <div class="theme-info">
                         <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div>
-                        <span>Светлая (Базовая)</span>
+                        <span class="edit-target">Светлая (Базовая)</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('black')">
                     <div class="theme-info">
                         <div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div>
-                        <span>Тёмная классика 🌟</span>
+                        <span class="edit-target">Тёмная классика 🌟</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('red')">
                     <div class="theme-info">
                         <div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div>
-                        <span>Красный неон</span>
+                        <span class="edit-target">Красный неон</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('green')">
                     <div class="theme-info">
                         <div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div>
-                        <span>Хакерский зелёный</span>
+                        <span class="edit-target">Хакерский зелёный</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('blue')">
                     <div class="theme-info">
                         <div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div>
-                        <span>Космический синий</span>
+                        <span class="edit-target">Космический синий</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ПРОВЕРКА АДМИНА -->
         <div id="page-captcha" class="page">
             <div class="admin-prompt-title">Активировать режим админа?</div>
-            <div class="captcha-phrase" id="captchaTarget">мокрая деревяшка</div>
+            <div class="captcha-phrase" id="captchaTarget">...</div>
             <input type="text" class="code-box" id="captchaInput" placeholder="Перепиши фразу сюда..." style="font-family: inherit; font-size: 15px;">
             <button class="btn-generate" onclick="checkAdminCaptcha()" style="background: #ffcc00; color: #000;">Подтвердить</button>
         </div>
@@ -367,10 +362,12 @@
     </div>
 
     <script>
+        let currentMode = null; // Текущий активный режим админа
+        let mathNum1, mathNum2, mathCorrectAnswer, pendingMode;
+
         function switchPage(pageId, btnElement) {
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
             document.getElementById(`page-${pageId}`).classList.add('active');
-
             if (btnElement) {
                 const pill = document.getElementById('pill');
                 pill.style.width = btnElement.offsetWidth + 'px';
@@ -379,36 +376,27 @@
         }
 
         window.onload = function() {
-            const menuBtn = document.getElementById('nav-menu');
-            switchPage('menu', menuBtn);
+            switchPage('menu', document.getElementById('nav-menu'));
+            setupFreedomEngine(); // Инициализация движка Свободы
         };
 
         function generateSteamKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-            function makeBlock() {
-                let block = '';
-                for (let i = 0; i < 5; i++) {
-                    block += chars.charAt(Math.floor(Math.random() * chars.length));
-                }
-                return block;
-            }
+            const makeBlock = () => Array.from({length: 5}, () => chars[Math.floor(Math.random() * chars.length)]).join('');
             document.getElementById('keyDisplay').value = `${makeBlock()}-${makeBlock()}-${makeBlock()}`;
         }
 
         function copyKey() {
             const copyText = document.getElementById('keyDisplay');
             if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
-            
             copyText.select();
-            copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
-            
-            const copyBtn = document.getElementById('copyBtn');
-            copyBtn.innerText = '✓';
-            setTimeout(() => copyBtn.innerText = 'Копия', 1000);
+            const btn = document.getElementById('copyBtnObj');
+            btn.innerText = '✓';
+            setTimeout(() => btn.innerText = 'Копия', 1000);
         }
 
-        // --- ЛОГИКА ТЕМ С ПАСХАЛКОЙ ---
+        // --- ЛОГИКА ТЕМ ---
         const themes = {
             white: { bg: '#f3f4f6', card: '#ffffff', border: '#d1d5db', accent: '#e5e7eb', btnText: '#1f2937', text: '#111111', pill: 'rgba(0,0,0,0.06)' },
             black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#3a475c', btnText: '#ffffff', text: '#ffffff', pill: 'rgba(255,255,255,0.08)' },
@@ -420,7 +408,6 @@
         function setTheme(themeName) {
             const root = document.documentElement;
             const t = themes[themeName];
-            
             root.style.setProperty('--bg-color', t.bg);
             root.style.setProperty('--card-bg', t.card);
             root.style.setProperty('--border-color', t.border);
@@ -429,35 +416,21 @@
             root.style.setProperty('--text-color', t.text);
             root.style.setProperty('--pill-bg', t.pill);
 
-            // ПОКАЗЫВАЕМ СОЛНЦЕ ТОЛЬКО НА ТЕМНОЙ ТЕМЕ
-            const sun = document.getElementById('secretSun');
-            if (themeName === 'black') {
-                sun.style.display = 'block';
-            } else {
-                sun.style.display = 'none';
-            }
+            document.getElementById('secretSun').style.display = (themeName === 'black') ? 'block' : 'none';
         }
 
-        // --- УДЕРЖАНИЕ СОЛНЦА И АДМИНКА ---
+        // --- ЗАРЯДКА СОЛНЦА ---
         let chargeTimer;
         let targetPhrase = "";
-        
-        const adjectives = ["мокрая", "главный", "хитрый", "грязный", "быстрый", "сонный", "железный", "золотой", "старый", "секретный"];
-        const nouns = ["деревяшка", "огурец", "хакер", "носок", "казино", "клавиатура", "мышка", "муха", "ключ", "барабан"];
-
-        function generatePhrase() {
-            return `${adjectives[Math.floor(Math.random() * adjectives.length)]} ${nouns[Math.floor(Math.random() * nouns.length)]}`;
-        }
+        const adjectives = ["мокрая", "главный", "хитрый", "быстрый", "сонный", "железный"];
+        const nouns = ["деревяшка", "огурец", "хакер", "носок", "муха", "клавиатура"];
 
         function startCharge() {
-            const sun = document.getElementById('secretSun');
-            sun.classList.add('charging');
-            
+            document.getElementById('secretSun').classList.add('charging');
             chargeTimer = setTimeout(() => {
-                sun.classList.remove('charging');
-                targetPhrase = generatePhrase();
+                document.getElementById('secretSun').classList.remove('charging');
+                targetPhrase = `${adjectives[Math.floor(Math.random()*adjectives.length)]} ${nouns[Math.floor(Math.random()*nouns.length)]}`;
                 document.getElementById('captchaTarget').innerText = targetPhrase;
-                document.getElementById('captchaInput').value = "";
                 switchPage('captcha', null);
             }, 3000);
         }
@@ -468,24 +441,136 @@
         }
 
         function checkAdminCaptcha() {
-            const userIn = document.getElementById('captchaInput').value.trim().toLowerCase();
-            if (userIn === targetPhrase) {
+            if (document.getElementById('captchaInput').value.trim().toLowerCase() === targetPhrase) {
                 document.getElementById('adminToggle').style.display = 'block';
-                alert('Режим админа успешно активирован! Панель доступна слева.');
                 switchPage('menu', document.getElementById('nav-menu'));
             } else {
-                alert('Неправильно! Попробуй еще раз переключиться на темную тему и зажать солнце.');
+                alert('Ошибка!');
                 switchPage('menu', document.getElementById('nav-menu'));
             }
         }
 
         function toggleAdminPanel() {
             const sidebar = document.getElementById('adminSidebar');
-            const toggleBtn = document.getElementById('adminToggle');
-            
+            const btn = document.getElementById('adminToggle');
             sidebar.classList.toggle('open');
-            toggleBtn.classList.toggle('panel-open');
-            toggleBtn.innerText = sidebar.classList.contains('open') ? '⬅' : '➔';
+            btn.classList.toggle('panel-open');
+            btn.innerText = sidebar.classList.contains('open') ? '⬅' : '➔';
+        }
+
+        // --- МАТЕМАТИЧЕСКАЯ ПРОВЕРКА ДЛЯ РЕЖИМОВ ---
+        function tryActivateMode(mode) {
+            pendingMode = mode;
+            mathNum1 = Math.floor(Math.random() * 10);
+            mathNum2 = Math.floor(Math.random() * 10);
+            
+            // Гарантируем положительный результат при вычитании
+            if(mathNum1 < mathNum2) { let temp = mathNum1; mathNum1 = mathNum2; mathNum2 = temp; }
+            mathCorrectAnswer = mathNum1 - mathNum2;
+
+            document.getElementById('mathQuestion').innerText = `Реши пример для активации: ${mathNum1} - ${mathNum2} = ?`;
+            document.getElementById('mathAnswer').value = "";
+            document.getElementById('mathTestBlock').style.display = 'flex';
+        }
+
+        function verifyMathAnswer() {
+            const userAns = parseInt(document.getElementById('mathAnswer').value);
+            const inputField = document.getElementById('mathAnswer');
+
+            if (userAns === mathCorrectAnswer) {
+                inputField.style.border = "2px solid #00ffcc"; // Зеленый неон
+                setTimeout(() => {
+                    document.getElementById('mathTestBlock').style.display = 'none';
+                    activateMode(pendingMode);
+                }, 60002026 / 60002026 * 600); // Быстрая задержка для визуального эффекта
+            } else {
+                inputField.style.border = "2px solid #ff3333"; // Красный неон
+            }
+        }
+
+        function activateMode(mode) {
+            // Отключаем прошлые режимы
+            currentMode = null;
+            document.documentElement.style.setProperty('--freedom-glow', 'none');
+            document.getElementById('modeFreedomBtn').classList.remove('active-mode');
+
+            if (mode === 'freedom') {
+                currentMode = 'freedom';
+                document.getElementById('modeFreedomBtn').classList.add('active-mode');
+                // Включаем ярко-жёлтый неон вокруг сайта
+                document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ffcc00, 0 0 30px #ffcc00');
+                alert('Режим свободы активирован! Теперь доступно редактирование текста (2 тапа) и перетаскивание окон (зажатие 2 сек).');
+            }
+        }
+
+        // --- ДВИЖОК РЕЖИМА СВОБОДЫ (ИНТЕРФЕЙСНЫЙ ХАК) ---
+        function setupFreedomEngine() {
+            // 1. Редактирование текста по двойному клику
+            document.body.addEventListener('dblclick', function(e) {
+                if (currentMode !== 'freedom') return;
+                if (e.target.classList.contains('edit-target')) {
+                    const currentText = e.target.innerText;
+                    const newText = prompt("Введите новый текст:", currentText);
+                    if (newText !== null) e.target.innerText = newText;
+                }
+            });
+
+            // 2. Перетаскивание объектов по зажатию на 2 секунды
+            let pressTimer;
+            let dragElement = null;
+            let offsetX = 0, offsetY = 0;
+
+            document.body.addEventListener('mousedown', startPress);
+            document.body.addEventListener('touchstart', startPress, {passive: false});
+
+            function startPress(e) {
+                if (currentMode !== 'freedom') return;
+                const target = e.target.closest('.drag-target');
+                if (!target) return;
+
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+
+                pressTimer = setTimeout(() => {
+                    dragElement = target;
+                    const rect = dragElement.getBoundingClientRect();
+                    offsetX = clientX - rect.left;
+                    offsetY = clientY - rect.top;
+
+                    dragElement.style.width = rect.width + 'px';
+                    dragElement.style.height = rect.height + 'px';
+                    dragElement.classList.add('draggable-active');
+                    
+                    moveAt(clientX, clientY);
+                }, 2000); // Ровно 2 секунды зажатия
+            }
+
+            function moveAt(x, y) {
+                if (!dragElement) return;
+                dragElement.style.left = (x - offsetX) + 'px';
+                dragElement.style.top = (y - offsetY) + 'px';
+            }
+
+            document.body.addEventListener('mousemove', (e) => {
+                if (!dragElement) return;
+                moveAt(e.clientX, e.clientY);
+            });
+
+            document.body.addEventListener('touchmove', (e) => {
+                if (!dragElement) return;
+                moveAt(e.touches[0].clientX, e.touches[0].clientY);
+            }, {passive: false});
+
+            document.body.addEventListener('mouseup', cancelPress);
+            document.body.addEventListener('touchend', cancelPress);
+
+            function cancelPress() {
+                clearTimeout(pressTimer);
+                if (dragElement) {
+                    dragElement.classList.remove('draggable-active');
+                    dragElement = null;
+                }
+            }
         }
     </script>
 </body>
