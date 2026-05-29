@@ -285,4 +285,471 @@
         function copyKey() {
             const copyText = document.getElementById('keyDisplay'); if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
             copyText.select(); navigator.clipboard.writeText(copyText.value);
-            document.getElementById('copyBtnObj').innerText = '✓'; setTimeout(() => document.
+            document.getElementById('copyBtnObj').innerText = '✓'; setTimeout(() => document.getElementById('copyBtnObj').innerText = 'Копия', 1000);
+        }
+
+        // --- ТЕМЫ ---
+        const themes = {
+            white: { bg: '#f3f4f6', card: '#ffffff', border: '#d1d5db', accent: '#e5e7eb', btnText: '#1f2937', text: '#111111', pill: 'rgba(0,0,0,0.06)' },
+            black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#3a475c', btnText: '#ffffff', text: '#ffffff', pill: 'rgba(255,255,255,0.08)' },
+            red: { bg: '#080101', card: 'rgba(25, 5, 5, 0.85)', border: '#4a0e0e', accent: '#ff3333', btnText: '#ffffff', text: '#ffe5e5', pill: 'rgba(255,51,51,0.2)' },
+            green: { bg: '#000800', card: 'rgba(5, 25, 5, 0.85)', border: '#0e4a0e', accent: '#33ff33', btnText: '#000000', text: '#e5ffe5', pill: 'rgba(51,255,51,0.2)' },
+            blue: { bg: '#01080f', card: 'rgba(5, 20, 35, 0.85)', border: '#0e3a5a', accent: '#3399ff', btnText: '#000000', text: '#e5f2ff', pill: 'rgba(51,153,255,0.2)' }
+        };
+
+        function setTheme(themeName) {
+            activeTheme = themeName;
+            const root = document.documentElement; const t = themes[themeName];
+            root.style.setProperty('--bg-color', t.bg); root.style.setProperty('--card-bg', t.card);
+            root.style.setProperty('--border-color', t.border); root.style.setProperty('--accent-color', t.accent);
+            root.style.setProperty('--btn-text', t.btnText); root.style.setProperty('--text-color', t.text);
+            root.style.setProperty('--pill-bg', t.pill);
+            document.getElementById('secretSun').style.display = (themeName === 'black') ? 'block' : 'none';
+            initBackgrounds();
+        }
+
+        // --- ИНИЦИАЛИЗАЦИЯ И ДВИЖОК ЭФФЕКТОВ ФОНА ---
+        function initBackgrounds() {
+            // Матрица
+            const fontSize = 14; const columns = Math.floor(bgCanvas.width / fontSize) + 1;
+            matrixColumns = Array.from({length: columns}, () => Math.floor(Math.random() * -bgCanvas.height / fontSize));
+
+            // Океан
+            oceanFish = [];
+            for(let i=0; i<8; i++) spawnFish(false);
+
+            // Красный космос (сингулярность)
+            spaceParticles = [];
+            for(let i=0; i<180; i++) {
+                spaceParticles.push({
+                    angle: Math.random() * Math.PI * 2,
+                    radius: Math.random() * (Math.max(bgCanvas.width, bgCanvas.height) * 0.5) + 20,
+                    speed: 0.002 + Math.random() * 0.006,
+                    size: Math.random() * 2 + 0.5,
+                    color: Math.random() > 0.4 ? '#ff3333' : '#660000'
+                });
+            }
+        }
+
+        function spawnFish(isGiantForce = false) {
+            // Шанс родить Левиафана (если принудительно или шанс 4%)
+            let isLeviathan = isGiantForce || (Math.random() < 0.04);
+            let size = isLeviathan ? (Math.random() * 250 + 200) : (Math.random() * 45 + 5);
+            
+            // Адекватные цвета подводного мира
+            let fishColors = ['#1a434e', '#2c3e50', '#1e5631', '#78281f', '#4a235a', '#566573'];
+            let color = fishColors[Math.floor(Math.random() * fishColors.length)];
+
+            oceanFish.push({
+                x: -size - 100,
+                y: Math.random() * (bgCanvas.height * 0.8) + (bgCanvas.height * 0.1),
+                size: size,
+                speed: isLeviathan ? (0.3 + Math.random() * 0.4) : (0.8 + Math.random() * 1.5),
+                color: color,
+                isLeviathan: isLeviathan,
+                tailPhase: Math.random() * 10
+            });
+        }
+
+        function renderLoop() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            if (activeTheme === 'green') {
+                // --- ХАКЕРСКИЙ ФОН МАТРИЦЫ ---
+                bgCtx.fillStyle = 'rgba(0, 8, 0, 0.08)';
+                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+                bgCtx.fillStyle = '#0f0'; bgCtx.font = '14px monospace';
+                const chars = "ｦｧｨｩｪｫｬｭｮｯｰｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ1234567890".split("");
+                
+                matrixColumns.forEach((y, index) => {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    const x = index * 14;
+                    bgCtx.fillText(text, x, y * 14);
+                    if (y * 14 > bgCanvas.height && Math.random() > 0.975) matrixColumns[index] = 0;
+                    matrixColumns[index]++;
+                });
+
+            } else if (activeTheme === 'blue') {
+                // --- СИНЯЯ ТЕМА: ЖИВОЙ ОКЕАН ---
+                oceanWaves += 0.01;
+                
+                // Проверяем наличие гигантов на холсте для затемнения океана
+                let hasLeviathan = oceanFish.some(f => f.isLeviathan && f.x > -f.size && f.x < bgCanvas.width + f.size);
+                oceanDarkness = hasLeviathan ? Math.min(oceanDarkness + 0.01, 0.5) : Math.max(oceanDarkness - 0.01, 0);
+
+                // Градиент глубины с учётом затемнения левиафаном
+                let oceanGrad = bgCtx.createLinearGradient(0, 0, 0, bgCanvas.height);
+                oceanGrad.addColorStop(0, '#02101c');
+                oceanGrad.addColorStop(1, hasLeviathan ? '#000307' : '#01080f');
+                bgCtx.fillStyle = oceanGrad; bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+                // Рисуем волны света на фоне
+                bgCtx.fillStyle = 'rgba(51, 153, 255, 0.03)';
+                for (let i = 0; i < 3; i++) {
+                    bgCtx.beginPath();
+                    bgCtx.moveTo(0, 0);
+                    for (let x = 0; x <= bgCanvas.width; x += 40) {
+                        bgCtx.lineTo(x, Math.sin(x * 0.005 + oceanWaves + i) * 15 + 30 + (i * 10));
+                    }
+                    bgCtx.lineTo(bgCanvas.width, 0); bgCtx.fill();
+                }
+
+                // Дно и водоросли
+                bgCtx.fillStyle = 'rgba(1, 6, 12, 0.8)';
+                bgCtx.beginPath(); bgCtx.ellipse(bgCanvas.width/2, bgCanvas.height, bgCanvas.width * 0.7, 50, 0, 0, Math.PI, true); bgCtx.fill();
+                
+                bgCtx.strokeStyle = '#0a2312'; bgCtx.lineWidth = 6;
+                for(let i = 10; i < bgCanvas.width; i += 60) {
+                    bgCtx.beginPath(); bgCtx.moveTo(i, bgCanvas.height);
+                    bgCtx.bezierCurveTo(i - 10 + Math.sin(oceanWaves + i)*15, bgCanvas.height - 80, i + 10 + Math.sin(oceanWaves + i)*10, bgCanvas.height - 150, i + Math.sin(oceanWaves + i)*20, bgCanvas.height - 200);
+                    bgCtx.stroke();
+                }
+
+                // Логика спавна рыб
+                if (oceanFish.length < 10 && Math.random() < 0.01) spawnFish(false);
+
+                // Рендеринг честных анатомических рыб
+                oceanFish.forEach((fish, idx) => {
+                    fish.x += fish.speed;
+                    fish.tailPhase += 0.08;
+
+                    bgCtx.save();
+                    bgCtx.fillStyle = fish.color;
+                    
+                    if (fish.isLeviathan) {
+                        // ОСОБЫЙ РЕНДЕР ЛЕВИАФАНА: Прорисовка гигантского глаза и проработанных деталей
+                        bgCtx.beginPath();
+                        bgCtx.moveTo(fish.x, fish.y);
+                        // Огромное массивное тело кита-чудовища
+                        bgCtx.bezierCurveTo(fish.x + fish.size*0.3, fish.y - fish.size*0.4, fish.x + fish.size*0.7, fish.y - fish.size*0.3, fish.x + fish.size, fish.y);
+                        bgCtx.bezierCurveTo(fish.x + fish.size*0.7, fish.y + fish.size*0.4, fish.x + fish.size*0.3, fish.y + fish.size*0.4, fish.x, fish.y);
+                        bgCtx.fill();
+
+                        // Огромный прорисованный жуткий светящийся глаз существа
+                        let eyeX = fish.x + fish.size * 0.25;
+                        let eyeY = fish.y - fish.size * 0.05;
+                        bgCtx.fillStyle = '#ffcc00';
+                        bgCtx.beginPath(); bgCtx.arc(eyeX, eyeY, fish.size * 0.04, 0, Math.PI*2); bgCtx.fill();
+                        bgCtx.fillStyle = '#000000';
+                        bgCtx.beginPath(); bgCtx.arc(eyeX, eyeY, fish.size * 0.02, 0, Math.PI*2); bgCtx.fill();
+
+                        // Движущийся гигантский плавник хвоста
+                        bgCtx.fillStyle = fish.color;
+                        bgCtx.beginPath();
+                        bgCtx.moveTo(fish.x, fish.y);
+                        let tailWiggle = Math.sin(fish.tailPhase) * (fish.size * 0.1);
+                        bgCtx.lineTo(fish.x - fish.size*0.2, fish.y - fish.size*0.2 + tailWiggle);
+                        bgCtx.lineTo(fish.x - fish.size*0.15, fish.y + tailWiggle);
+                        bgCtx.lineTo(fish.x - fish.size*0.2, fish.y + fish.size*0.2 + tailWiggle);
+                        bgCtx.closePath(); bgCtx.fill();
+                    } else {
+                        // Маленькие и средние реалистичные рыбки
+                        bgCtx.beginPath();
+                        bgCtx.moveTo(fish.x + fish.size, fish.y); // Нос
+                        bgCtx.bezierCurveTo(fish.x + fish.size * 0.6, fish.y - fish.size * 0.3, fish.x + fish.size * 0.2, fish.y - fish.size * 0.2, fish.x, fish.y); // Верх
+                        bgCtx.bezierCurveTo(fish.x + fish.size * 0.2, fish.y + fish.size * 0.2, fish.x + fish.size * 0.6, fish.y + fish.size * 0.3, fish.x + fish.size, fish.y); // Низ
+                        bgCtx.fill();
+
+                        // Хвостик
+                        bgCtx.beginPath(); bgCtx.moveTo(fish.x, fish.y);
+                        let w = Math.sin(fish.tailPhase) * (fish.size * 0.3);
+                        bgCtx.lineTo(fish.x - fish.size * 0.3, fish.y - fish.size * 0.25 + w);
+                        bgCtx.lineTo(fish.x - fish.size * 0.15, fish.y + w);
+                        bgCtx.lineTo(fish.x - fish.size * 0.3, fish.y + fish.size * 0.25 + w);
+                        bgCtx.closePath(); bgCtx.fill();
+                    }
+                    bgCtx.restore();
+
+                    // Удаление выплывших за экран рыб
+                    if (fish.x > bgCanvas.width + fish.size + 100) oceanFish.splice(idx, 1);
+                });
+
+            } else if (activeTheme === 'red') {
+                // --- КРАСНЫЙ НЕОН: ГРАВИТАЦИОННАЯ СИНГУЛЯРНОСТЬ ---
+                bgCtx.fillStyle = 'rgba(5, 1, 1, 0.15)';
+                bgCtx.fillRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+                let centerX = bgCanvas.width / 2; let centerY = bgCanvas.height / 2;
+
+                // Отрисовка центрального гравитационного небытия
+                let coreGrad = bgCtx.createRadialGradient(centerX, centerY, 10, centerX, centerY, 90);
+                coreGrad.addColorStop(0, '#000000'); coreGrad.addColorStop(0.4, '#150000');
+                coreGrad.addColorStop(1, 'transparent');
+                bgCtx.fillStyle = coreGrad; bgCtx.beginPath(); bgCtx.arc(centerX, centerY, 90, 0, Math.PI*2); bgCtx.fill();
+
+                // Вращение и симуляция притяжения частиц к мышке/пальцу пользователя
+                spaceParticles.forEach(p => {
+                    p.angle += p.speed;
+                    
+                    // Вычисляем базовую траекторию вокруг центра
+                    let bx = centerX + Math.cos(p.angle) * p.radius;
+                    let by = centerY + Math.sin(p.angle) * p.radius;
+
+                    // Сила притяжения интерактивного курсора
+                    let dx = mouseX - bx; let dy = mouseY - by;
+                    let dist = Math.sqrt(dx*dx + dy*dy);
+                    if (dist < 220) {
+                        let force = (220 - dist) / 220;
+                        bx += (dx / dist) * force * 45;
+                        by += (dy / dist) * force * 45;
+                    }
+
+                    bgCtx.fillStyle = p.color;
+                    bgCtx.beginPath(); bgCtx.arc(bx, by, p.size, 0, Math.PI*2); bgCtx.fill();
+                });
+            }
+
+            requestAnimationFrame(renderLoop);
+        }
+
+        // --- ЗАРЯДКА СОЛНЦА ---
+        let chargeTimer; let targetPhrase = "";
+        const adjectives = ["мокрая", "главный", "хитрый", "быстрый"]; const nouns = ["деревяшка", "огурец", "хакер", "носок"];
+        function startCharge() {
+            document.getElementById('secretSun').classList.add('charging');
+            chargeTimer = setTimeout(() => {
+                document.getElementById('secretSun').classList.remove('charging');
+                targetPhrase = `${adjectives[Math.floor(Math.random()*adjectives.length)]} ${nouns[Math.floor(Math.random()*nouns.length)]}`;
+                document.getElementById('captchaTarget').innerText = targetPhrase; switchPage('captcha', null);
+            }, 3000);
+        }
+        function stopCharge() { document.getElementById('secretSun').classList.remove('charging'); clearTimeout(chargeTimer); }
+        function checkAdminCaptcha() {
+            if (document.getElementById('captchaInput').value.trim().toLowerCase() === targetPhrase) {
+                document.getElementById('adminToggle').style.display = 'block'; switchPage('menu', document.getElementById('nav-menu'));
+            } else { alert('Ошибка!'); switchPage('menu', document.getElementById('nav-menu')); }
+        }
+        function toggleAdminPanel() {
+            const sidebar = document.getElementById('adminSidebar'); const btn = document.getElementById('adminToggle');
+            sidebar.classList.toggle('open'); btn.classList.toggle('panel-open');
+            btn.innerText = sidebar.classList.contains('open') ? '⬅' : '➔';
+        }
+
+        // --- ТАЙМЕР РЕЖИМОВ ---
+        function tryActivateMode(mode) {
+            pendingMode = mode;
+            if (globalAdminTime.isBlocked) {
+                const checkValue = prompt(`Ваше время на сегодня кончилось! Попробуйте через 24 часа. Код обхода:`);
+                if (checkValue === "6767") activateMode(mode, true); return;
+            }
+            mathNum1 = Math.floor(Math.random() * 10); mathNum2 = Math.floor(Math.random() * 10);
+            if(mathNum1 < mathNum2) { let temp = mathNum1; mathNum1 = mathNum2; mathNum2 = temp; }
+            mathCorrectAnswer = mathNum1 - mathNum2;
+            document.getElementById('mathQuestion').innerText = `Реши пример: ${mathNum1} - ${mathNum2} = ?`;
+            document.getElementById('mathAnswer').value = ""; document.getElementById('mathTestBlock').style.display = 'flex';
+        }
+
+        function verifyMathAnswer() {
+            const userIn = document.getElementById('mathAnswer').value.trim();
+            if (userIn === `${mathCorrectAnswer}6767`) { document.getElementById('mathTestBlock').style.display = 'none'; activateMode(pendingMode, true); return; }
+            if (parseInt(userIn) === mathCorrectAnswer) { document.getElementById('mathTestBlock').style.display = 'none'; activateMode(pendingMode, false); }
+            else { document.getElementById('mathAnswer').style.border = "2px solid #ff3333"; }
+        }
+
+        function activateMode(mode, isInfinite) {
+            if (isInfinite) globalAdminTime.isInfinite = true;
+            document.getElementById('modeFreedomBtn').classList.remove('active-mode');
+            document.getElementById('modePaintBtn').classList.remove('active-mode');
+            canvas.classList.remove('drawing-active'); document.getElementById('paintPanel').style.display = 'none';
+
+            currentMode = mode;
+            if (mode === 'freedom') {
+                document.getElementById('modeFreedomBtn').classList.add('active-mode');
+                document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ffcc00, 0 0 30px #ffcc00');
+            } else if (mode === 'paint') {
+                document.getElementById('modePaintBtn').classList.add('active-mode');
+                document.documentElement.style.setProperty('--freedom-glow', 'inset 0 0 20px #ff33a6, 0 0 30px #ff33a6');
+                canvas.classList.add('drawing-active');
+                document.getElementById('paintPanel').style.setProperty('display', 'flex', 'important');
+            }
+            if (!globalAdminTime.isInfinite) startGlobalTimer();
+            else document.getElementById('adminTimer').style.display = 'none';
+            toggleAdminPanel();
+        }
+
+        function startGlobalTimer() {
+            if (countdownInterval) return;
+            document.getElementById('adminTimer').style.display = 'block';
+            countdownInterval = setInterval(() => {
+                if (globalAdminTime.isInfinite) { clearInterval(countdownInterval); document.getElementById('adminTimer').style.display = 'none'; return; }
+                let s = globalAdminTime.timeLeft; let m = parseInt(s / 60, 10); let sec = parseInt(s % 60, 10);
+                document.getElementById('adminTimer').innerText = `${m < 10 ? "0"+m : m}:${sec < 10 ? "0"+sec : sec}`;
+                if (--globalAdminTime.timeLeft < 0) {
+                    clearInterval(countdownInterval); document.getElementById('adminTimer').style.display = 'none';
+                    currentMode = null; globalAdminTime.isBlocked = true; resetAllDestructions();
+                    document.documentElement.style.setProperty('--freedom-glow', 'none');
+                    canvas.classList.remove('drawing-active'); document.getElementById('paintPanel').style.display = 'none';
+                    alert("Время истекло! Все админ-режимы заблокированы на 24 часа.");
+                }
+            }, 1000);
+        }
+
+        // --- СВОРАЧИВАНИЕ ПАНЕЛИ РИСОВАНИЯ ---
+        function toggleCollapsePanel() {
+            const panel = document.getElementById('paintPanel'); const btn = document.getElementById('collapsePanelBtn');
+            panel.classList.toggle('collapsed'); btn.innerText = panel.classList.contains('collapsed') ? '✏️' : '–';
+        }
+
+        function setupPanelDrag() {
+            const panel = document.getElementById('paintPanel'); let isDraggingPanel = false; let pX = 0, pY = 0;
+            panel.addEventListener('mousedown', (e) => { if(e.target.closest('.paint-content') && !panel.classList.contains('collapsed')) return; isDraggingPanel = true; pX = e.clientX - panel.offsetLeft; pY = e.clientY - panel.offsetTop; });
+            panel.addEventListener('touchstart', (e) => { if(e.target.closest('.paint-content') && !panel.classList.contains('collapsed')) return; isDraggingPanel = true; pX = e.touches[0].clientX - panel.offsetLeft; pY = e.touches[0].clientY - panel.offsetTop; });
+            window.addEventListener('mousemove', (e) => { if(isDraggingPanel) { panel.style.left = (e.clientX - pX) + 'px'; panel.style.top = (e.clientY - pY) + 'px'; panel.style.right = 'auto'; panel.style.bottom = 'auto'; } });
+            window.addEventListener('touchmove', (e) => { if(isDraggingPanel) { panel.style.left = (e.touches[0].clientX - pX) + 'px'; panel.style.top = (e.touches[0].clientY - pY) + 'px'; panel.style.right = 'auto'; panel.style.bottom = 'auto'; } });
+            window.addEventListener('mouseup', () => isDraggingPanel = false); window.addEventListener('touchend', () => isDraggingPanel = false);
+        }
+
+        // --- УЛУЧШЕННЫЙ ДВИЖОК РИСОВАНИЯ ---
+        function setMainTool(tool) {
+            currentMainTool = tool; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tool-${tool}`).classList.add('active');
+        }
+
+        function setupDrawingEngine() {
+            canvas.addEventListener('mousedown', startDraw); canvas.addEventListener('mousemove', drawProcess); canvas.addEventListener('mouseup', stopDraw);
+            canvas.addEventListener('touchstart', e => { e.preventDefault(); startDraw(e.touches[0]); }, {passive:false});
+            canvas.addEventListener('touchmove', e => { e.preventDefault(); drawProcess(e.touches[0]); }, {passive:false});
+            canvas.addEventListener('touchend', stopDraw);
+
+            setInterval(() => {
+                if (activeDrips.length === 0) return;
+                activeDrips.forEach((drip, index) => {
+                    ctx.save(); ctx.globalAlpha = drip.opacity; ctx.fillStyle = drip.color;
+                    ctx.beginPath(); ctx.arc(drip.x, drip.y, drip.size, 0, Math.PI * 2); ctx.fill(); ctx.restore();
+                    drip.y += 0.8; drip.size -= 0.005; drip.length--;
+                    if (drip.length <= 0 || drip.size <= 0.5) activeDrips.splice(index, 1);
+                });
+            }, 25);
+
+            function startDraw(e) {
+                if (currentMode !== 'paint') return; isDrawing = true;
+                const rect = canvas.getBoundingClientRect(); lastX = e.clientX - rect.left; lastY = e.clientY - rect.top;
+
+                if (currentMainTool === 'picker') {
+                    const imgData = ctx.getImageData(lastX, lastY, 1, 1).data;
+                    if (imgData[3] > 0) {
+                        document.getElementById('brushColor').value = "#" + ("000000" + ((imgData[0] << 16) | (imgData[1] << 8) | imgData[2]).toString(16)).slice(-6);
+                    }
+                    isDrawing = false; return;
+                }
+                if (currentMainTool === 'bucket') {
+                    ctx.save(); ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
+                    ctx.fillStyle = document.getElementById('brushColor').value; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.restore(); isDrawing = false; return;
+                }
+
+                const bType = document.getElementById('brushTypeSelect').value;
+                if (bType === 'sponge') { drawSpongeStamp(lastX, lastY); isDrawing = false; }
+                if (bType === 'spray') {
+                    sprayX = lastX; sprayY = lastY; sprayHoldTime = 0;
+                    sprayInterval = setInterval(() => {
+                        sprayHoldTime += 30; drawSprayPoints(sprayX, sprayY);
+                        if (sprayHoldTime > 2500 && Math.random() < 0.15) {
+                            activeDrips.push({ x: sprayX + (Math.random()*6 - 3), y: sprayY, size: (document.getElementById('brushSize').value / 6), color: document.getElementById('brushColor').value, opacity: document.getElementById('brushOpacity').value / 100, length: Math.floor(sprayHoldTime / 35) });
+                        }
+                    }, 30);
+                }
+            }
+
+            function drawProcess(e) {
+                if (!isDrawing || currentMode !== 'paint') return;
+                const rect = canvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                const bType = document.getElementById('brushTypeSelect').value;
+                const bSize = parseInt(document.getElementById('brushSize').value);
+
+                ctx.save();
+                ctx.globalAlpha = document.getElementById('brushOpacity').value / 100;
+                ctx.strokeStyle = document.getElementById('brushColor').value;
+                ctx.fillStyle = document.getElementById('brushColor').value;
+                ctx.lineWidth = bSize; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+
+                if (bType === 'classic') {
+                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+                } else if (bType === 'eraser') {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+                } else if (bType === 'spray') {
+                    sprayX = x; sprayY = y;
+                } else if (bType === 'destroyer') {
+                    ctx.globalCompositeOperation = 'destination-out';
+                    ctx.beginPath(); ctx.moveTo(lastX, lastY); ctx.lineTo(x, y); ctx.stroke();
+
+                    canvas.style.pointerEvents = 'none';
+                    let targets = document.all;
+                    for(let i=0; i<targets.length; i++) {
+                        let el = targets[i];
+                        if (el.getBoundingClientRect && !el.closest('.admin-sidebar') && !el.closest('.admin-toggle-btn') && !el.closest('.paint-panel') && el !== document.body && el !== canvas && el !== bgCanvas && el.style.visibility !== 'hidden') {
+                            let r = el.getBoundingClientRect();
+                            if (e.clientX >= r.left - bSize/2 && e.clientX <= r.right + bSize/2 && e.clientY >= r.top - bSize/2 && e.clientY <= r.bottom + bSize/2) {
+                                el.style.visibility = 'hidden';
+                            }
+                        }
+                    }
+                    canvas.style.pointerEvents = 'auto';
+                }
+                ctx.restore(); lastX = x; lastY = y;
+            }
+
+            function stopDraw() { isDrawing = false; clearInterval(sprayInterval); }
+
+            function drawSpongeStamp(cx, cy) {
+                const size = document.getElementById('brushSize').value * 2;
+                ctx.save(); ctx.globalAlpha = document.getElementById('brushOpacity').value / 100; ctx.fillStyle = document.getElementById('brushColor').value;
+                for (let i = 0; i < size * 3; i++) {
+                    const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (size / 2);
+                    const px = cx + Math.cos(angle) * radius; const py = cy + Math.sin(angle) * radius;
+                    if (Math.random() > 0.3) { ctx.beginPath(); ctx.arc(px, py, Math.random() * 3 + 1, 0, Math.PI * 2); ctx.fill(); }
+                }
+                ctx.restore();
+            }
+
+            function drawSprayPoints(cx, cy) {
+                const size = document.getElementById('brushSize').value * 1.5;
+                ctx.save(); ctx.globalAlpha = document.getElementById('brushOpacity').value / 100; ctx.fillStyle = document.getElementById('brushColor').value;
+                for (let i = 0; i < 15; i++) {
+                    const angle = Math.random() * Math.PI * 2; const radius = Math.random() * (size / 2);
+                    ctx.fillRect(cx + Math.cos(angle) * radius, cy + Math.sin(angle) * radius, 1.5, 1.5);
+                }
+                ctx.restore();
+            }
+        }
+
+        function resetAllDestructions() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            pageCanvasMemory = { info: null, menu: null, themes: null };
+            document.querySelectorAll('*').forEach(el => { if(!el.closest('.admin-sidebar') && el !== bgCanvas) el.style.visibility = 'visible'; });
+            activeDrips = [];
+        }
+
+        // --- ДВИЖОК СВОБОДЫ ---
+        function setupFreedomEngine() {
+            document.body.addEventListener('dblclick', function(e) {
+                if (currentMode !== 'freedom') return;
+                if (e.target.classList.contains('edit-target')) {
+                    const nextText = prompt("Новый текст:", e.target.innerText);
+                    if (nextText !== null) e.target.innerText = nextText;
+                }
+            });
+            let pressTimer; let dragElement = null; let startX = 0, startY = 0;
+            document.body.addEventListener('mousedown', onPointerDown); document.body.addEventListener('touchstart', onPointerDown, {passive: false});
+
+            function onPointerDown(e) {
+                if (currentMode !== 'freedom') return; const target = e.target.closest('.drag-target'); if (!target) return;
+                if (e.target.closest('#bgEffectsCanvas')) return; // Игнорируем фон
+                const pageX = e.touches ? e.touches[0].pageX : e.pageX; const pageY = e.touches ? e.touches[0].pageY : e.pageY;
+                pressTimer = setTimeout(() => {
+                    dragElement = target; const rect = dragElement.getBoundingClientRect();
+                    startX = pageX - (rect.left + window.scrollX); startY = pageY - (rect.top + window.scrollY);
+                    dragElement.style.width = rect.width + 'px'; dragElement.style.height = rect.height + 'px';
+                    dragElement.classList.add('drag-active'); moveElement(pageX, pageY);
+                }, 2000);
+            }
+            function moveElement(x, y) { if (!dragElement) return; dragElement.style.left = (x - startX) + 'px'; dragElement.style.top = (y - startY) + 'px'; }
+            document.body.addEventListener('mousemove', (e) => { if (!dragElement) return; moveElement(e.pageX, e.pageY); });
+            document.body.addEventListener('touchmove', (e) => { if (!dragElement) return; moveElement(e.touches[0].pageX, e.touches[0].pageY); }, {passive: false});
+            document.body.addEventListener('mouseup', onPointerUp); document.body.addEventListener('touchend', onPointerUp);
+            function onPointerUp() { clearTimeout(pressTimer); if (dragElement) { dragElement.classList.remove('drag-active'); dragElement.style.position = 'absolute'; dragElement = null; } }
+        }
+    </script>
+</body>
+</html>
