@@ -5,14 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Key Generator</title>
     <style>
-        /* Базовые стили и переменные для тем */
+        /* Переменные для тем */
         :root {
             --bg-color: #0b0e14;
             --card-bg: #151a24;
             --border-color: #222c3c;
-            --accent-color: #00ffcc;
+            --accent-color: #3a475c;
+            --btn-text: #ffffff;
             --text-color: #ffffff;
-            --pill-bg: rgba(255, 255, 255, 0.1);
+            --pill-bg: rgba(255, 255, 255, 0.08);
         }
 
         * {
@@ -20,7 +21,7 @@
             margin: 0;
             padding: 0;
             font-family: 'Segoe UI', Arial, sans-serif;
-            transition: all 0.3s ease;
+            transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
         }
 
         body {
@@ -34,42 +35,42 @@
             padding: 20px;
         }
 
-        /* Навигация-таблетка */
+        /* Навигация с ровной таблеткой во всю высоту */
         .nav-container {
             background: var(--card-bg);
-            padding: 6px;
+            padding: 0;
             border-radius: 50px;
             border: 1px solid var(--border-color);
             display: inline-flex;
             position: relative;
             margin-bottom: 30px;
+            overflow: hidden;
         }
 
         .nav-btn {
             background: none;
             border: none;
             color: var(--text-color);
-            padding: 10px 20px;
+            padding: 12px 24px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             z-index: 2;
-            border-radius: 50px;
         }
 
-        /* Активная таблетка */
+        /* Таблетка на всю высоту внутренней области */
         .nav-pill {
             position: absolute;
-            top: 6px;
-            left: 6px;
-            height: calc(100% - 12px);
+            top: 0;
+            left: 0;
+            height: 100%;
             background: var(--pill-bg);
             border-radius: 50px;
             z-index: 1;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Главный контейнер */
+        /* Контейнер */
         .main-card {
             background: var(--card-bg);
             border: 1px solid var(--border-color);
@@ -77,7 +78,7 @@
             padding: 30px;
             width: 100%;
             max-width: 400px;
-            min-height: 250px;
+            min-height: 220px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             display: flex;
             flex-direction: column;
@@ -92,55 +93,60 @@
             display: block;
         }
 
-        /* Стили Главного Меню */
-        .input-group {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .code-input {
-            flex: 1;
+        /* Поле вывода ключа */
+        .code-box {
+            width: 100%;
             background: var(--bg-color);
             border: 2px solid var(--border-color);
             border-radius: 8px;
-            padding: 12px;
+            padding: 14px;
             font-family: 'Courier New', monospace;
             font-size: 18px;
             font-weight: bold;
             color: var(--text-color);
             text-align: center;
             letter-spacing: 1px;
+            margin-bottom: 16px;
         }
 
-        .btn-copy {
-            background: var(--border-color);
-            border: none;
-            color: var(--text-color);
-            padding: 0 15px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-generate {
-            background: var(--accent-color);
-            color: #000000;
-            border: none;
-            padding: 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: bold;
-            text-transform: uppercase;
-            cursor: pointer;
+        /* Новый блок разделенных кнопок в ряд */
+        .action-row {
+            display: flex;
+            gap: 10px;
             width: 100%;
         }
 
-        .btn-generate:active {
-            transform: scale(0.98);
+        .btn-generate {
+            flex: 3; /* Занимает большую часть */
+            background: var(--accent-color);
+            color: var(--btn-text);
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
         }
 
-        /* Стили Информации */
+        .btn-copy {
+            flex: 1.2; /* Меньший отрезок справа */
+            background: var(--border-color);
+            color: var(--text-color);
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-align: center;
+        }
+
+        .btn-generate:active, .btn-copy:active {
+            transform: scale(0.97);
+        }
+
+        /* Текст инфо */
         .info-text {
             font-size: 15px;
             line-height: 1.6;
@@ -149,11 +155,11 @@
             text-align: center;
         }
 
-        /* Стили Тем */
+        /* Темы */
         .theme-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 10px;
         }
 
         .theme-item {
@@ -161,7 +167,7 @@
             align-items: center;
             justify-content: space-between;
             background: var(--bg-color);
-            padding: 10px 15px;
+            padding: 12px 15px;
             border-radius: 8px;
             border: 1px solid var(--border-color);
             cursor: pointer;
@@ -173,12 +179,11 @@
             gap: 12px;
         }
 
-        /* Мини-картинка превью темы */
         .theme-preview {
             width: 24px;
             height: 24px;
             border-radius: 6px;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.15);
         }
     </style>
 </head>
@@ -186,56 +191,57 @@
 
     <div class="nav-container">
         <div class="nav-pill" id="pill"></div>
-        <button class="nav-btn" onclick="switchPage('menu', this)">Меню</button>
-        <button class="nav-btn" onclick="switchPage('info', this)">Инфо</button>
-        <button class="nav-btn" onclick="switchPage('themes', this)">Темы</button>
+        <button class="nav-btn" id="nav-info" onclick="switchPage('info', this)">Инфо</button>
+        <button class="nav-btn" id="nav-menu" onclick="switchPage('menu', this)">Меню</button>
+        <button class="nav-btn" id="nav-themes" onclick="switchPage('themes', this)">Темы</button>
     </div>
 
     <div class="main-card">
         
-        <div id="page-menu" class="page active">
-            <div class="input-group">
-                <input type="text" class="code-input" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
-                <button class="btn-copy" onclick="copyKey()">Копия</button>
-            </div>
-            <button class="btn-generate" onclick="generateSteamKey()">Сгенерировать</button>
-        </div>
-
         <div id="page-info" class="page">
             <p class="info-text">
                 На этом сайте генерируются случайные символы для ключа от игры Steam. С шансом 99.99999% сгенерируется неверный код, но всегда останется тот самый 0.00001% на рабочую игру! Удачи!
             </p>
         </div>
 
+        <div id="page-menu" class="page">
+            <input type="text" class="code-box" id="keyDisplay" value="XXXXX-XXXXX-XXXXX" readonly>
+            
+            <div class="action-row">
+                <button class="btn-generate" onclick="generateSteamKey()">Сгенерировать</button>
+                <button class="btn-copy" id="copyBtn" onclick="copyKey()">Копия</button>
+            </div>
+        </div>
+
         <div id="page-themes" class="page">
             <div class="theme-list">
                 <div class="theme-item" onclick="setTheme('black')">
                     <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #00ffcc);"></div>
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #0b0e14, #4e5d73);"></div>
                         <span>Тёмная классика</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('white')">
                     <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #f5f5f5, #333333);"></div>
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #ffffff, #d1d5db);"></div>
                         <span>Светлая</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('red')">
                     <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #1a0505, #ff3333);"></div>
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #120202, #ff4444);"></div>
                         <span>Красный неон</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('green')">
                     <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #051a05, #33ff33);"></div>
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #021202, #44ff44);"></div>
                         <span>Хакерский зелёный</span>
                     </div>
                 </div>
                 <div class="theme-item" onclick="setTheme('blue')">
                     <div class="theme-info">
-                        <div class="theme-preview" style="background: linear-gradient(135deg, #050e1a, #3388ff);"></div>
+                        <div class="theme-preview" style="background: linear-gradient(135deg, #020b12, #44a6ff);"></div>
                         <span>Космический синий</span>
                     </div>
                 </div>
@@ -245,26 +251,23 @@
     </div>
 
     <script>
-        // --- ЛОГИКА ПЕРЕКЛЮЧЕНИЯ СТРАНИЦ (ТАБЛЕТКА) ---
+        // Переключение страниц и движение ровной таблетки
         function switchPage(pageId, btnElement) {
-            // Скрываем все страницы
             document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            // Показываем нужную
             document.getElementById(`page-${pageId}`).classList.add('active');
 
-            // Двигаем таблетку
             const pill = document.getElementById('pill');
             pill.style.width = btnElement.offsetWidth + 'px';
             pill.style.left = btnElement.offsetLeft + 'px';
         }
 
-        // Устанавливаем таблетку на первую кнопку при старте
+        // Стартуем сразу со вкладки Меню (она по центру)
         window.onload = function() {
-            const firstBtn = document.querySelector('.nav-btn');
-            switchPage('menu', firstBtn);
+            const menuBtn = document.getElementById('nav-menu');
+            switchPage('menu', menuBtn);
         };
 
-        // --- ЛОГИКА ГЕНЕРАЦИИ КЛЮЧА ---
+        // Генератор ключа Steam
         function generateSteamKey() {
             const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
             function makeBlock() {
@@ -274,29 +277,30 @@
                 }
                 return block;
             }
-            const newKey = `${makeBlock()}-${makeBlock()}-${makeBlock()}`;
-            document.getElementById('keyDisplay').value = newKey;
+            document.getElementById('keyDisplay').value = `${makeBlock()}-${makeBlock()}-${makeBlock()}`;
         }
 
-        // --- ЛОГИКА КОПИРОВАНИЯ ---
+        // Копирование в буфер
         function copyKey() {
             const copyText = document.getElementById('keyDisplay');
+            if(copyText.value === "XXXXX-XXXXX-XXXXX") return;
+            
             copyText.select();
-            copyText.setSelectionRange(0, 99999); // Для мобилок
+            copyText.setSelectionRange(0, 99999);
             navigator.clipboard.writeText(copyText.value);
             
-            const copyBtn = document.querySelector('.btn-copy');
+            const copyBtn = document.getElementById('copyBtn');
             copyBtn.innerText = '✓';
             setTimeout(() => copyBtn.innerText = 'Копия', 1000);
         }
 
-        // --- СМЕНА ТЕМ ---
+        // Цветовые конфигурации тем
         const themes = {
-            black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#00ffcc', text: '#ffffff', pill: 'rgba(255,255,255,0.1)' },
-            white: { bg: '#f0f2f5', card: '#ffffff', border: '#cccccc', accent: '#333333', text: '#111111', pill: 'rgba(0,0,0,0.1)' },
-            red: { bg: '#120202', card: '#1f0505', border: '#3d0a0a', accent: '#ff4444', text: '#ffe5e5', pill: 'rgba(255,68,68,0.2)' },
-            green: { bg: '#021202', card: '#051f05', border: '#0a3d0a', accent: '#44ff44', text: '#e5ffe5', pill: 'rgba(68,255,68,0.2)' },
-            blue: { bg: '#020b12', card: '#05141f', border: '#0a273d', accent: '#44a6ff', text: '#e5f3ff', pill: 'rgba(68,166,255,0.2)' }
+            black: { bg: '#0b0e14', card: '#151a24', border: '#222c3c', accent: '#3a475c', btnText: '#ffffff', text: '#ffffff', pill: 'rgba(255,255,255,0.08)' },
+            white: { bg: '#f3f4f6', card: '#ffffff', border: '#d1d5db', accent: '#e5e7eb', btnText: '#1f2937', text: '#111111', pill: 'rgba(0,0,0,0.06)' },
+            red: { bg: '#120202', card: '#1f0505', border: '#3d0a0a', accent: '#ff4444', btnText: '#000000', text: '#ffe5e5', pill: 'rgba(255,68,68,0.15)' },
+            green: { bg: '#021202', card: '#051f05', border: '#0a3d0a', accent: '#44ff44', btnText: '#000000', text: '#e5ffe5', pill: 'rgba(68,255,68,0.15)' },
+            blue: { bg: '#020b12', card: '#05141f', border: '#0a273d', accent: '#44a6ff', btnText: '#000000', text: '#e5f3ff', pill: 'rgba(68,166,255,0.15)' }
         };
 
         function setTheme(themeName) {
@@ -307,6 +311,7 @@
             root.style.setProperty('--card-bg', t.card);
             root.style.setProperty('--border-color', t.border);
             root.style.setProperty('--accent-color', t.accent);
+            root.style.setProperty('--btn-text', t.btnText);
             root.style.setProperty('--text-color', t.text);
             root.style.setProperty('--pill-bg', t.pill);
         }
